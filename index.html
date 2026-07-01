@@ -1,0 +1,4643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Data Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --accent: #e8ff47;
+    --accent2: #47d9ff;
+    --text: #f0f0f0;
+    --muted: #666;
+    --card: #141414;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem; height: 60px;
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--accent); letter-spacing: -0.02em; cursor: pointer; }
+  .nav-links { display: flex; }
+  .nav-link { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.4rem 1rem; cursor: pointer; transition: color 0.2s; background: none; border: none; font-family: 'DM Mono', monospace; }
+  .nav-link:hover { color: var(--text); }
+  .nav-link.active { color: var(--accent); }
+
+  /* Hamburger */
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 0.4rem; z-index: 201; }
+  .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: var(--text); transition: all 0.3s ease; }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* Mobile drawer */
+  .nav-drawer {
+    display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,10,0.98); z-index: 199;
+    flex-direction: column; align-items: flex-start; justify-content: center;
+    padding: 2rem 2rem; gap: 0;
+  }
+  .nav-drawer.open { display: flex; animation: fadeIn 0.2s ease; }
+  .nav-drawer .nav-link {
+    font-size: 1.4rem; letter-spacing: -0.01em; text-transform: none;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    padding: 1rem 0; width: 100%; border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .nav-drawer .nav-link:last-child { border-bottom: none; }
+  .nav-drawer .nav-link.active { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+  }
+
+  /* PAGES */
+  .page { display: none; padding-top: 60px; min-height: 100vh; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* PAGE HERO */
+  .page-hero { padding: 4rem 2.5rem 2.5rem; border-bottom: 1px solid var(--border); }
+  .page-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  .page-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.03em; max-width: 700px; }
+  .page-sub { color: var(--muted); margin-top: 1rem; font-size: 0.85rem; max-width: 500px; line-height: 1.6; }
+
+  .content { padding: 2.5rem 2.5rem; max-width: 1200px; }
+
+  /* SUBJECT CARDS */
+  .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; border: 1px solid var(--border); }
+  .subject-card { background: var(--card); padding: 1.75rem; cursor: pointer; transition: background 0.2s; border: none; position: relative; overflow: hidden; text-align: left; width: 100%; }
+  .subject-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s ease; }
+  .subject-card:hover { background: #181818; }
+  .subject-card:hover::before { transform: scaleY(1); }
+  .subject-card:hover .card-arrow { transform: translateX(4px); }
+  .card-index { font-size: 0.65rem; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 1rem; }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; }
+  .card-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+  .card-arrow { display: inline-block; margin-top: 1.2rem; font-size: 0.75rem; color: var(--accent); transition: transform 0.2s; }
+
+  /* REPO CARDS (Journey → GitHub course repos) */
+  .journey-subhead { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; margin: 3rem 0 1rem; }
+  .journey-subhead .jh-title { font-family:'Syne', sans-serif; font-weight:700; font-size:1.1rem; }
+  .journey-subhead .jh-note { font-size:0.72rem; color: var(--muted); }
+  .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; border: 1px solid var(--border); }
+  .repo-card { background: var(--card); padding: 1.75rem; cursor: pointer; transition: background 0.2s; border: none; position: relative; overflow: hidden; text-align: left; width: 100%; display: block; text-decoration: none; color: inherit; }
+  .repo-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s ease; }
+  .repo-card:hover { background: #181818; }
+  .repo-card:hover::before { transform: scaleY(1); }
+  .repo-card:hover .card-arrow { transform: translateX(4px); }
+  .repo-card-icon { font-size: 0.9rem; margin-bottom: 1rem; opacity: 0.6; }
+
+  @media (max-width: 640px) {
+    .page-hero { padding: 2.5rem 1.25rem 1.75rem; }
+    .content { padding: 1.5rem 1.25rem; }
+    .subject-grid { grid-template-columns: 1fr; }
+    .repo-grid { grid-template-columns: 1fr; }
+  }
+
+  /* NOTES */
+  .back-btn { font-size: 0.75rem; color: var(--accent); cursor: pointer; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; background: none; border: none; font-family: 'DM Mono', monospace; padding: 0; }
+  .back-btn:hover { opacity: 0.7; }
+  .placeholder-tag { display: inline-block; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; background: #1a1a1a; border: 1px solid var(--border); color: var(--muted); padding: 0.2rem 0.5rem; margin-bottom: 0.75rem; }
+
+  /* NOTES SIDEBAR LAYOUT */
+  .notes-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    min-height: 70vh;
+  }
+
+  /* Sidebar */
+  .notes-sidebar {
+    border-right: 1px solid var(--border);
+    background: var(--card);
+    overflow-y: auto;
+    position: sticky;
+    top: 60px;
+    max-height: calc(100vh - 60px);
+  }
+  .notes-sidebar-subject {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .notes-sidebar-subject span { color: var(--accent); font-size: 0.65rem; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; font-weight: 400; }
+  .notes-sidebar-section-label {
+    padding: 1rem 1.5rem 0.4rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #444;
+  }
+  .notes-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.65rem 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+  }
+  .notes-sidebar-item:hover { background: #181818; color: var(--text); }
+  .notes-sidebar-item.active { color: var(--text); background: #181818; border-left-color: var(--accent); }
+  .notes-sidebar-item.active .sbi-dot { background: var(--accent); }
+  .sbi-dot { width: 5px; height: 5px; border-radius: 50%; background: #333; flex-shrink: 0; transition: background 0.15s; }
+  .notes-sidebar-section-divider { height: 1px; background: var(--border); margin: 0.5rem 0; }
+
+  /* Mobile: collapsible topic picker */
+  .notes-mobile-toggle {
+    display: none;
+    width: 100%;
+    background: var(--card);
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .notes-mobile-toggle .toggle-arrow { transition: transform 0.25s; color: var(--accent); }
+  .notes-mobile-toggle.open .toggle-arrow { transform: rotate(180deg); }
+  .notes-mobile-drawer {
+    display: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .notes-mobile-drawer.open { display: block; }
+
+  /* Notes content panel */
+  .notes-content-panel { padding: 2rem 2rem; overflow-y: auto; }
+  .notes-content-panel.empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 300px; color: #333;
+  }
+  .notes-content-panel.empty .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; }
+  .notes-content-panel.empty p { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: #333; }
+
+  .notes-topic-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.2rem, 3vw, 1.5rem); letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .notes-topic-section { font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+  .notes-topic-body { font-size: 0.82rem; color: #aaa; line-height: 1.9; }
+  .notes-topic-body p { margin-bottom: 1.2rem; }
+
+  .notes-nav-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border);
+    gap: 1rem;
+  }
+  .notes-nav-btn {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted);
+    background: none; border: 1px solid var(--border); padding: 0.5rem 1rem;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s; letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .notes-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .notes-nav-btn:disabled { opacity: 0.2; cursor: default; }
+  .notes-nav-btn:disabled:hover { border-color: var(--border); color: var(--muted); }
+
+  /* Handwritten notes download card */
+  .hw-notes-card {
+    margin-top: 2rem;
+    border: 1px solid #2a2a2a;
+    background: #0e0e0e;
+    position: relative;
+    overflow: hidden;
+  }
+  .hw-notes-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+  }
+  .hw-notes-inner {
+    padding: 1.25rem 1.5rem 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .hw-notes-left { display: flex; align-items: center; gap: 1rem; }
+  .hw-notes-icon {
+    font-size: 1.6rem;
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+  .hw-notes-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+  .hw-notes-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .hw-notes-meta {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+  .hw-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 0.55rem 1.1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .hw-download-btn:hover { opacity: 0.8; }
+  .hw-download-btn.no-pdf {
+    background: none;
+    border: 1px dashed #333;
+    color: #444;
+    cursor: default;
+  }
+  .hw-download-btn.no-pdf:hover { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .notes-layout { grid-template-columns: 1fr; border: none; min-height: unset; }
+    .notes-sidebar { display: none; }
+    .notes-mobile-toggle { display: flex; }
+    .notes-content-panel { padding: 1.5rem 1.25rem; border: 1px solid var(--border); }
+    .hw-notes-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* PROJECT TABS */
+  .proj-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 2.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; white-space: nowrap; }
+  .proj-tabs::-webkit-scrollbar { display: none; }
+  .proj-tab { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.75rem 1.2rem; cursor: pointer; transition: color 0.2s; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Mono', monospace; margin-bottom: -1px; flex-shrink: 0; }
+  .proj-tab:hover { color: var(--text); }
+  .proj-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .proj-panel { display: none; }
+  .proj-panel.active { display: block; animation: fadeIn 0.25s ease; }
+
+  /* PROJECT CARD GRID */
+  .proj-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+
+  @media (max-width: 640px) {
+    .proj-card-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .proj-tabs { margin-bottom: 1.5rem; }
+  }
+
+  .proj-card { background: var(--card); border: 1px solid var(--border); cursor: pointer; transition: border-color 0.2s, transform 0.2s; overflow: hidden; }
+  .proj-card:hover { border-color: #333; transform: translateY(-3px); }
+  .proj-card:hover .proj-card-title { color: var(--accent); }
+  .proj-card:hover .proj-card-cta { opacity: 1; }
+
+  /* Card image area */
+  .proj-card-img { width: 100%; height: 190px; background: #0f0f0f; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+  .proj-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .proj-card:hover .proj-card-img img { transform: scale(1.03); }
+  .proj-img-placeholder { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; height: 100%; justify-content: center; background: linear-gradient(135deg, #0f0f0f 0%, #141414 100%); }
+  .proj-img-placeholder .img-icon { font-size: 2.5rem; opacity: 0.2; }
+  .proj-img-placeholder .img-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: #2a2a2a; border: 1px dashed #222; padding: 0.25rem 0.6rem; }
+
+  .proj-card-body { padding: 1.25rem 1.4rem 1.5rem; }
+  .proj-card-lang { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+  .proj-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.6rem; transition: color 0.2s; line-height: 1.3; }
+  .proj-card-overview { font-size: 0.76rem; color: var(--muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .proj-card-cta { margin-top: 1rem; font-size: 0.7rem; color: var(--accent); opacity: 0.4; transition: opacity 0.2s; letter-spacing: 0.06em; }
+
+  /* PROJECT DETAIL */
+  .proj-detail-page { display: none; animation: fadeIn 0.25s ease; }
+  .proj-detail-page.active { display: block; }
+
+  .detail-hero-img-wrap { width: 100%; border: 1px solid var(--border); overflow: hidden; margin-bottom: 2rem; background: #0d0d0d; }
+  .detail-hero-img-wrap img { width: 100%; max-height: 420px; object-fit: cover; display: block; }
+  .detail-hero-placeholder { height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; }
+  .detail-hero-placeholder .big-icon { font-size: 3.5rem; opacity: 0.1; }
+  .detail-hero-placeholder p { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: #2a2a2a; border: 1px dashed #1e1e1e; padding: 0.4rem 0.9rem; }
+
+  /* Power BI screenshot gallery */
+  .img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+  .gallery-thumb { border: 1px solid var(--border); overflow: hidden; cursor: zoom-in; transition: border-color 0.2s; }
+  .gallery-thumb:hover { border-color: var(--accent); }
+  .gallery-thumb img { width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.3s; }
+  .gallery-thumb:hover img { transform: scale(1.03); }
+  .gallery-thumb-placeholder { width: 100%; height: 160px; background: #0f0f0f; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; }
+  .g-icon { font-size: 1.8rem; opacity: 0.15; }
+  .g-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #2a2a2a; border: 1px dashed #1e1e1e; padding: 0.25rem 0.6rem; }
+  .gallery-caption { padding: 0.55rem 0.75rem; font-size: 0.7rem; color: var(--muted); border-top: 1px solid var(--border); background: var(--card); }
+
+  .proj-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  @media (max-width: 680px) { .proj-detail-grid { grid-template-columns: 1fr; } }
+  .detail-block { margin-bottom: 1.5rem; }
+  .detail-block-label { font-size: 0.63rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent2); margin-bottom: 0.6rem; }
+  .detail-block-text { font-size: 0.82rem; color: #aaa; line-height: 1.8; }
+
+  .github-btn { display: inline-flex; align-items: center; gap: 0.6rem; background: var(--accent); color: #000; padding: 0.65rem 1.3rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 500; text-decoration: none; letter-spacing: 0.05em; cursor: pointer; border: none; transition: opacity 0.2s; }
+  .github-btn:hover { opacity: 0.8; }
+  .external-btn { display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border); color: var(--text); padding: 0.7rem 1.4rem; font-family: 'DM Mono', monospace; font-size: 0.78rem; text-decoration: none; transition: border-color 0.2s, color 0.2s; background: none; cursor: pointer; }
+  .external-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* CERTIFICATIONS — Grid + Detail */
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; border: 1px solid var(--border); }
+
+  .cert-card { background: var(--card); cursor: pointer; transition: background 0.2s; position: relative; overflow: hidden; border: none; text-align: left; width: 100%; padding: 0; }
+  .cert-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s ease; z-index: 1; }
+  .cert-card:hover { background: #181818; }
+  .cert-card:hover::before { transform: scaleY(1); }
+
+  .cert-card-thumb { width: 100%; height: 150px; background: #0f0f0f; border-bottom: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .cert-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .cert-card:hover .cert-card-thumb img { transform: scale(1.04); }
+  .cert-card-thumb-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; background: linear-gradient(135deg,#0f0f0f,#141414); }
+  .cert-card-thumb-placeholder .ctp-icon { font-size: 2.2rem; opacity: 0.15; }
+  .cert-card-thumb-placeholder .ctp-label { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #2a2a2a; border: 1px dashed #222; padding: 0.2rem 0.55rem; }
+
+  .cert-card-body { padding: 1.25rem 1.4rem 1.4rem; }
+  .cert-card-issuer { font-size: 0.6rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+  .cert-card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; line-height: 1.3; color: var(--text); transition: color 0.2s; }
+  .cert-card:hover .cert-card-name { color: var(--accent); }
+  .cert-card-cta { margin-top: 0.75rem; font-size: 0.68rem; color: var(--accent); opacity: 0.4; transition: opacity 0.2s; letter-spacing: 0.06em; }
+  .cert-card:hover .cert-card-cta { opacity: 1; }
+
+  /* Cert Detail Overlay */
+  .cert-detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem; }
+  .cert-detail-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+  .cert-detail-box { background: var(--surface); border: 1px solid var(--border); max-width: 860px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; display: grid; grid-template-columns: 1.1fr 1fr; }
+  .cert-detail-close { position: absolute; top: 1rem; right: 1.25rem; font-size: 1.1rem; color: var(--muted); cursor: pointer; background: none; border: none; font-family: 'DM Mono', monospace; z-index: 10; transition: color 0.2s; }
+  .cert-detail-close:hover { color: var(--text); }
+
+  .cert-detail-img-col { border-right: 1px solid var(--border); background: #0a0a0a; display: flex; align-items: center; justify-content: center; min-height: 340px; overflow: hidden; cursor: zoom-in; position: relative; }
+  .cert-detail-img-col img { width: 100%; height: 100%; object-fit: contain; display: block; transition: transform 0.3s; }
+  .cert-detail-img-col:hover img { transform: scale(1.03); }
+  .cert-detail-img-col .cert-zoom-hint { position: absolute; bottom: 0.75rem; right: 0.75rem; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(0,0,0,0.8); color: var(--muted); padding: 0.25rem 0.5rem; border: 1px solid #2a2a2a; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .cert-detail-img-col:hover .cert-zoom-hint { opacity: 1; }
+  .cert-detail-no-img { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; height: 100%; cursor: default; }
+  .cert-detail-no-img .ndimg-icon { font-size: 3.5rem; opacity: 0.08; }
+  .cert-detail-no-img .ndimg-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #2a2a2a; border: 1px dashed #1e1e1e; padding: 0.3rem 0.7rem; }
+
+  .cert-detail-info { padding: 2.5rem 2rem 2rem; display: flex; flex-direction: column; justify-content: center; gap: 0; }
+  .cert-detail-info .cd-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  .cert-detail-info .cd-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1rem, 3vw, 1.35rem); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 0.5rem; }
+  .cert-detail-info .cd-date { font-size: 0.72rem; color: var(--muted); margin-bottom: 2rem; }
+  .cert-link-btn { display: inline-flex; align-items: center; gap: 0.55rem; background: var(--accent); color: #000; padding: 0.65rem 1.3rem; font-family: 'DM Mono', monospace; font-size: 0.74rem; font-weight: 500; text-decoration: none; letter-spacing: 0.05em; transition: opacity 0.2s; border: none; cursor: pointer; width: fit-content; }
+  .cert-link-btn:hover { opacity: 0.8; }
+  .cert-no-link { display: inline-flex; align-items: center; gap: 0.5rem; border: 1px dashed #2a2a2a; color: #444; padding: 0.65rem 1.3rem; font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; cursor: default; width: fit-content; }
+
+  @media (max-width: 640px) {
+    .cert-grid { grid-template-columns: 1fr 1fr; }
+    .cert-detail-box { grid-template-columns: 1fr; max-height: 88vh; }
+    .cert-detail-img-col { min-height: 220px; border-right: none; border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 400px) {
+    .cert-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+  .about-bio { font-size: 0.85rem; line-height: 1.9; color: #bbb; }
+  .about-bio p { margin-bottom: 1rem; }
+  .about-links-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 1.5rem; }
+  .social-link { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text); transition: padding-left 0.2s; }
+  .social-link:hover { padding-left: 0.5rem; }
+  .social-link:hover .social-name { color: var(--accent); }
+  .social-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+  .social-handle { font-size: 0.72rem; color: var(--muted); }
+  .social-arrow { font-size: 0.8rem; color: var(--muted); }
+
+  @media (max-width: 700px) {
+    .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .proj-detail-grid { grid-template-columns: 1fr; }
+    .img-gallery { grid-template-columns: 1fr; }
+  }
+
+  /* LIGHTBOX */
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 999; align-items: center; justify-content: center; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border: 1px solid var(--border); }
+  .lightbox-close { position: absolute; top: 1.5rem; right: 2rem; font-size: 1.5rem; color: var(--muted); cursor: pointer; background: none; border: none; font-family: 'DM Mono', monospace; }
+  .lightbox-close:hover { color: var(--text); }
+</style>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close">✕</button>
+  <img id="lightbox-img" src="" alt=""/>
+</div>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">AP'S DATA PORTFOLIO</div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="showPage('journey')">Journey</button>
+    <button class="nav-link" onclick="showPage('projects')">Projects</button>
+    <button class="nav-link" onclick="showPage('certifications')">Certifications</button>
+    <button class="nav-link" onclick="showPage('about')">About</button>
+  </div>
+  <button class="nav-hamburger" id="hamburger" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <button class="nav-link" onclick="showPage('journey');closeDrawer()">Journey</button>
+  <button class="nav-link" onclick="showPage('projects');closeDrawer()">Projects</button>
+  <button class="nav-link" onclick="showPage('certifications');closeDrawer()">Certifications</button>
+  <button class="nav-link" onclick="showPage('about');closeDrawer()">About</button>
+</div>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div style="padding:0 2.5rem;min-height:calc(100vh - 60px);display:flex;flex-direction:column;justify-content:center;">
+    <div style="max-width:800px;">
+      <p class="page-label">Data Science Portfolio</p>
+      <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.4rem,8vw,5.5rem);line-height:1;letter-spacing:-0.04em;margin-bottom:1.25rem;">
+        Turning Data<br/><span style="color:var(--accent)">Into Clarity.</span>
+      </h1>
+      <p style="color:var(--muted);font-size:clamp(0.8rem,2vw,0.9rem);line-height:1.8;max-width:480px;margin-bottom:2.5rem;">
+        A curated portfolio of my learning journey, data projects, and professional certifications in data science and analytics.
+      </p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button onclick="showPage('journey')" style="background:var(--accent);color:#000;border:none;padding:0.75rem 1.5rem;font-family:'DM Mono',monospace;font-size:0.78rem;letter-spacing:0.05em;cursor:pointer;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">Explore Journey →</button>
+        <button onclick="showPage('projects')" style="background:none;color:var(--text);border:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'DM Mono',monospace;font-size:0.78rem;letter-spacing:0.05em;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#e8ff47'" onmouseout="this.style.borderColor='var(--border)'">View Projects</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNEY -->
+<div id="page-journey" class="page">
+  <div class="page-hero">
+    <p class="page-label">01 — Learning Path</p>
+    <h1 class="page-title">My Data Journey So Far</h1>
+    <p class="page-sub">Notes, exercises, and code from each course I'm learning — click a name to open its GitHub repository.</p>
+  </div>
+  <div class="content">
+    <div class="repo-grid" id="repo-grid"></div>
+  </div>
+</div>
+
+<!-- NOTES DETAIL -->
+<div id="page-notes" class="page">
+  <div class="page-hero">
+    <p class="page-label" id="notes-label"></p>
+    <h1 class="page-title" id="notes-title"></h1>
+    <p class="page-sub" id="notes-sub"></p>
+  </div>
+  <div style="padding: 1.5rem 2.5rem 2rem; max-width:1200px;">
+    <button class="back-btn" onclick="showPage('journey')">← Back to Journey</button>
+    <!-- Mobile topic picker (shown on small screens) -->
+    <div id="notes-mobile-wrap" style="margin-bottom:1rem;">
+      <button class="notes-mobile-toggle" id="notes-mobile-btn" onclick="toggleMobileTopics()">
+        <span id="notes-mobile-label">Select a topic</span>
+        <span class="toggle-arrow">▾</span>
+      </button>
+      <div class="notes-mobile-drawer" id="notes-mobile-drawer"></div>
+    </div>
+    <div class="notes-layout">
+      <div class="notes-sidebar" id="notes-sidebar"></div>
+      <div class="notes-content-panel empty" id="notes-content">
+        <div class="empty-icon">📖</div>
+        <p>Select a topic from the sidebar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div id="page-projects" class="page">
+  <div class="page-hero">
+    <p class="page-label">02 — Work</p>
+    <h1 class="page-title">Projects</h1>
+    <p class="page-sub">Click any card to explore the full project details, key findings, and repository.</p>
+  </div>
+  <div class="content">
+    <div class="proj-tabs">
+      <button class="proj-tab active" onclick="switchTab(event,'python')">Python</button>
+      <button class="proj-tab" onclick="switchTab(event,'sql')">SQL</button>
+      <button class="proj-tab" onclick="switchTab(event,'powerbi')">Power BI</button>
+      <button class="proj-tab" onclick="switchTab(event,'excel')">Excel</button>
+      <button class="proj-tab" onclick="switchTab(event,'tableau')">Tableau</button>
+      <button class="proj-tab" onclick="switchTab(event,'r')">R</button>
+    </div>
+    <div id="panel-python" class="proj-panel active"><div id="cards-python" class="proj-card-grid"></div><div id="detail-python" class="proj-detail-page"></div></div>
+    <div id="panel-sql" class="proj-panel"><div id="cards-sql" class="proj-card-grid"></div><div id="detail-sql" class="proj-detail-page"></div></div>
+    <div id="panel-powerbi" class="proj-panel"><div id="cards-powerbi" class="proj-card-grid"></div><div id="detail-powerbi" class="proj-detail-page"></div></div>
+    <div id="panel-excel" class="proj-panel">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:2rem;">Excel projects hosted on Google Drive.</p>
+      <a href="YOUR_GOOGLE_DRIVE_LINK" target="_blank" class="external-btn">Open Excel Projects on Google Drive ↗</a>
+    </div>
+    <div id="panel-tableau" class="proj-panel">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:2rem;">Interactive Tableau visualizations on Tableau Public.</p>
+      <a href="YOUR_TABLEAU_PUBLIC_LINK" target="_blank" class="external-btn">View on Tableau Public ↗</a>
+    </div>
+    <div id="panel-r" class="proj-panel"><div id="cards-r" class="proj-card-grid"></div><div id="detail-r" class="proj-detail-page"></div></div>
+  </div>
+</div>
+
+<!-- CERTIFICATIONS -->
+<div id="page-certifications" class="page">
+  <div class="page-hero">
+    <p class="page-label">03 — Credentials</p>
+    <h1 class="page-title">Certifications</h1>
+    <p class="page-sub">Professional certifications and credentials earned throughout my data science journey.</p>
+  </div>
+  <div class="content">
+    <div class="cert-grid" id="cert-grid"></div>
+  </div>
+</div>
+
+<!-- CERT DETAIL OVERLAY -->
+<div class="cert-detail-overlay" id="cert-overlay" onclick="closeCertOverlay(event)">
+  <div class="cert-detail-box" id="cert-detail-box">
+    <button class="cert-detail-close" onclick="closeCertOverlay()">✕</button>
+    <div class="cert-detail-img-col" id="cert-detail-img-col"></div>
+    <div class="cert-detail-info" id="cert-detail-info"></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="page-about" class="page">
+  <div class="page-hero">
+    <p class="page-label">04 — About</p>
+    <h1 class="page-title">About Me</h1>
+  </div>
+  <div class="content">
+    <div class="about-grid">
+      <div>
+        <div class="about-bio">
+          <p>Hi, I'm Aparajito Paul — a data science enthusiast passionate about turning raw data into meaningful insights that drive real decisions.</p>
+          <p>My journey spans statistics, machine learning, and data visualisation. I enjoy working across the full data pipeline — from wrangling messy datasets to building predictive models and compelling dashboards.</p>
+          <p>When I'm not working with data, I'm sharpening my skills on LeetCode, exploring new datasets, and continuously learning to stay at the edge of what's possible.</p>
+          <p style="color:var(--muted);font-size:0.75rem;margin-top:2rem;">Replace this description with your own bio ↑</p>
+        </div>
+      </div>
+      <div>
+        <div class="about-links-title">Connect With Me</div>
+        <a href="https://github.com/AparajitoPaul" target="_blank" class="social-link"><div><div class="social-name">GitHub</div><div class="social-handle">@AparajitoPaul </div></div><div class="social-arrow">↗</div></a>
+        <a href="https://www.linkedin.com/in/aparajito-paul-data/" target="_blank" class="social-link"><div><div class="social-name">LinkedIn</div><div class="social-handle">Aparajito Paul</div></div><div class="social-arrow">↗</div></a>
+        <a href="https://leetcode.com/u/AparajitoPaul/" target="_blank" class="social-link"><div><div class="social-name">LeetCode</div><div class="social-handle">@AparajitoPaul</div></div><div class="social-arrow">↗</div></a>
+        <a href="https://www.hackerrank.com/profile/aparajitopaul" target="_blank" class="social-link"><div><div class="social-name">HackerRank</div><div class="social-handle">@aparajitopaul</div></div><div class="social-arrow">↗</div></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── HANDWRITTEN NOTES PDF PATHS ──────────────────────────────
+// For each topic, add the path to your PDF file.
+// Leave as null if you haven't uploaded the PDF yet.
+// Example: 'Sample Spaces & Events': 'notes/stats_sample_spaces.pdf'
+const notesPdfs = {
+  statistics: {
+    'Sample Spaces & Events':                  null,
+    'Axioms of Probability':                   null,
+    'Conditional Probability':                 null,
+    'Bayes\' Theorem':                         null,
+    'Independence':                            null,
+    'Law of Total Probability':                null,
+    'Random Variables':                        null,
+    'PMF, PDF & CDF':                          null,
+    'Expectation & Variance':                  null,
+    'Covariance & Correlation':                null,
+    'Moment Generating Functions':             null,
+    'Key Distributions':                       null,
+    'Joint Distributions':                     null,
+    'Marginal & Conditional Distributions':    null,
+    'Covariance Matrix':                       null,
+    'Multivariate Normal Distribution':        null,
+    'Correlation Structure':                   null,
+    'Independence vs Uncorrelated':            null,
+    'Point Estimation':                        null,
+    'Maximum Likelihood Estimation (MLE)':     null,
+    'Method of Moments':                       null,
+    'Bias & Variance of Estimators':           null,
+    'Consistency':                             null,
+    'Efficiency & Cramér–Rao Bound':           null,
+    'Sampling Distributions':                  null,
+    'Law of Large Numbers':                    null,
+    'Central Limit Theorem':                   null,
+    'Slutsky\'s Theorem':                      null,
+    'Delta Method':                            null,
+    'Null & Alternative Hypotheses':           null,
+    'Type I & Type II Errors':                 null,
+    'p-values':                                null,
+    'Z-Test':                                  null,
+    't-Test':                                  null,
+    'Chi-Square Test':                         null,
+    'Likelihood Ratio Test':                   null,
+    'Power Analysis':                          null,
+    'Simple Linear Regression':                null,
+    'Multiple Linear Regression':              null,
+    'Gauss–Markov Theorem':                    null,
+    'ANOVA':                                   null,
+    'Logistic Regression':                     null,
+    'Residual Analysis':                       null,
+    'Multicollinearity':                       null,
+    'Model Diagnostics':                       null,
+    'Prior, Likelihood & Posterior':           null,
+    'Conjugate Priors':                        null,
+    'Beta–Binomial Model':                     null,
+    'Gaussian–Gaussian Model':                 null,
+    'MAP Estimation':                          null,
+    'Posterior Predictive Distribution':       null,
+    'Markov Chain Monte Carlo (Conceptual)':   null,
+    'Information Theory':                      null,
+    'Cross-Entropy Loss':                      null,
+    'Maximum Entropy Principle':               null,
+    'Expectation–Maximization (EM)':           null,
+    'Bootstrapping':                           null,
+    'Resampling Methods':                      null,
+    'Time Series Basics':                      null,
+  },
+  linearalgebra: {
+    'Vector Operations':                       null,
+    'Norms':                                   null,
+    'Inner Products':                          null,
+    'Vector Spaces':                           null,
+    'Subspaces':                               null,
+    'Linear Independence':                     null,
+    'Basis & Dimension':                       null,
+    'Linear Transformations':                  null,
+    'Kernel & Image':                          null,
+    'Rank–Nullity Theorem':                    null,
+    'Orthogonality':                           null,
+    'Gram–Schmidt Process':                    null,
+    'QR Decomposition':                        null,
+    'Least Squares':                           null,
+    'Eigenvalues & Eigenvectors':              null,
+    'Diagonalisation':                         null,
+    'LU Decomposition':                        null,
+    'Singular Value Decomposition (SVD)':      null,
+    'Gradients & Jacobians':                   null,
+    'Hessians & Curvature':                    null,
+    'Optimization Link':                       null,
+  },
+  mltechniques: {
+    'Classification Algorithms':               null,
+    'Regression Algorithms':                   null,
+    'Clustering':                              null,
+    'Dimensionality Reduction':                null,
+  },
+  mlfoundations: {
+    'Loss Functions':                          null,
+    'Gradient Descent':                        null,
+    'Bias-Variance Tradeoff':                  null,
+    'Regularisation':                          null,
+  },
+  mlpractice: {
+    'Feature Engineering':                     null,
+    'Data Pipelines':                          null,
+    'Model Evaluation':                        null,
+    'Hyperparameter Tuning':                   null,
+  }
+};
+
+// ── NOTES DATA ───────────────────────────────────────────────
+const notesData = {
+   statistics: { label:'01a — Statistics', title:'Statistics', sections:[
+    { title:'Foundation Of Probability', items:[
+      {
+  h:'Sample Spaces & Events',
+  p:`
+
+<h3>1. Random Experiment</h3>
+
+A random experiment is a process whose outcome cannot be predicted with certainty.
+
+<h3>2. Sample Space</h3>
+
+The <b>sample space</b> $\\Omega$ is the set of all possible outcomes.
+
+Examples:
+
+<ul>
+<li>Coin toss: $\\Omega = \\{H, T\\}$</li>
+<li>Dice roll: $\\Omega = \\{1,2,3,4,5,6\\}$</li>
+<li>Continuous case: $\\Omega = [0,1]$</li>
+</ul>
+
+<h3>3. Events</h3>
+
+An event $A$ is a subset of $\\Omega$:
+
+$$
+A \\subseteq \\Omega
+$$
+
+<h3>4. Set Operations</h3>
+
+Union:
+$$
+A \\cup B
+$$
+
+Intersection:
+$$
+A \\cap B
+$$
+
+Complement:
+$$
+A^c = \\Omega \\setminus A
+$$
+
+<h3>5. Interpretation</h3>
+
+Probability theory is measure theory applied to sets.
+
+`
+},
+{
+  h:'Axioms of Probability',
+  p:`
+
+<h3>1. Probability Measure</h3>
+
+A probability function:
+
+$$
+P : \\mathcal{F} \\to [0,1]
+$$
+
+where $\\mathcal{F}$ is a sigma-algebra of events.
+
+<h3>2. Three Axioms</h3>
+
+1. Non-negativity:
+
+$$
+P(A) \\ge 0
+$$
+
+2. Normalization:
+
+$$
+P(\\Omega) = 1
+$$
+
+3. Countable Additivity:
+
+For disjoint events:
+
+$$
+P\\left( \\bigcup_i A_i \\right) = \\sum_i P(A_i)
+$$
+
+<h3>3. Derived Results</h3>
+
+$$
+P(A^c) = 1 - P(A)
+$$
+
+$$
+P(A \\cup B) = P(A) + P(B) - P(A \\cap B)
+$$
+
+`
+},
+{
+  h:'Conditional Probability',
+  p:`
+
+<h3>1. Definition</h3>
+
+For $P(B) > 0$:
+
+$$
+P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}
+$$
+
+<h3>2. Interpretation</h3>
+
+Conditional probability restricts the sample space to $B$.
+
+<h3>3. Multiplication Rule</h3>
+
+$$
+P(A \\cap B) = P(A \\mid B) P(B)
+$$
+
+<h3>4. Chain Rule</h3>
+
+$$
+P(A_1 \\cap ... \\cap A_n)
+= P(A_1)
+\\prod_{i=2}^n P(A_i \\mid A_1,...,A_{i-1})
+$$
+
+`
+},
+{
+  h:'Bayes’ Theorem',
+  p:`
+
+<h3>1. Statement</h3>
+
+$$
+P(A \\mid B)
+=
+\\frac{P(B \\mid A) P(A)}{P(B)}
+$$
+
+<h3>2. Law of Total Probability</h3>
+
+If $\\{A_i\\}$ partitions $\\Omega$:
+
+$$
+P(B) = \\sum_i P(B \\mid A_i) P(A_i)
+$$
+
+<h3>3. Bayesian Form</h3>
+
+$$
+Posterior
+=
+\\frac{Likelihood \\times Prior}{Evidence}
+$$
+
+<h3>4. ML Example</h3>
+
+Naive Bayes classifier:
+
+$$
+P(y \\mid x)
+\\propto
+P(x \\mid y) P(y)
+$$
+
+`
+},
+{
+  h:'Independence',
+  p:`
+
+<h3>1. Definition</h3>
+
+Events $A$ and $B$ are independent if:
+
+$$
+P(A \\cap B) = P(A) P(B)
+$$
+
+Equivalent:
+
+$$
+P(A \\mid B) = P(A)
+$$
+
+<h3>2. Multiple Independence</h3>
+
+Pairwise independence does not imply mutual independence.
+
+<h3>3. Interpretation</h3>
+
+Independence means knowledge of one event gives no information about the other.
+
+`
+},
+{
+  h:'Law of Total Probability',
+  p:`
+
+If $\\{A_i\\}$ forms a partition:
+
+$$
+P(B) = \\sum_i P(B \\mid A_i) P(A_i)
+$$
+
+Used to decompose complex probabilities.
+
+Foundation for Bayesian inference and mixture models.
+
+`
+}
+      
+    ]},
+    { title:'Random Variables & Distributions', items:[
+      {
+  h:'Random Variables',
+  p:`
+
+<h3>1. Definition</h3>
+
+A random variable is a measurable function:
+
+$$
+X : \\Omega \\to \\mathbb{R}
+$$
+
+It assigns a real number to each outcome.
+
+<h3>2. Discrete Random Variable</h3>
+
+Takes countable values:
+
+$$
+P(X = x_i) = p_i
+$$
+
+with:
+
+$$
+\\sum_i p_i = 1
+$$
+
+<h3>3. Continuous Random Variable</h3>
+
+Defined via density:
+
+$$
+f(x) \\ge 0
+$$
+
+$$
+\\int_{-\\infty}^{\\infty} f(x) dx = 1
+$$
+
+Probability:
+
+$$
+P(a \\le X \\le b)
+=
+\\int_a^b f(x) dx
+$$
+
+`
+},
+      {
+  h:'PMF, PDF & CDF',
+  p:`
+
+<h3>1. PMF (Discrete)</h3>
+
+$$
+p(x) = P(X = x)
+$$
+
+<h3>2. PDF (Continuous)</h3>
+
+$$
+f(x)
+$$
+
+Probability over interval:
+
+$$
+P(a \\le X \\le b) = \\int_a^b f(x) dx
+$$
+
+<h3>3. CDF</h3>
+
+$$
+F(x) = P(X \\le x)
+$$
+
+Properties:
+
+<ul>
+<li>Non-decreasing</li>
+<li>Right-continuous</li>
+<li>Limits: $F(-\\infty)=0$, $F(\\infty)=1$</li>
+</ul>
+
+Relationship:
+
+$$
+f(x) = \\frac{d}{dx} F(x)
+$$
+
+`
+},
+{
+  h:'Expectation & Variance',
+  p:`
+
+<h3>1. Expectation</h3>
+
+Discrete:
+
+$$
+E[X] = \\sum_x x p(x)
+$$
+
+Continuous:
+
+$$
+E[X] = \\int x f(x) dx
+$$
+
+<h3>2. Linearity</h3>
+
+$$
+E[aX + bY] = aE[X] + bE[Y]
+$$
+
+<h3>3. Variance</h3>
+
+$$
+Var(X) = E[(X - \\mu)^2]
+$$
+
+Equivalent form:
+
+$$
+Var(X) = E[X^2] - (E[X])^2
+$$
+
+<h3>4. Scaling</h3>
+
+$$
+Var(aX) = a^2 Var(X)
+$$
+
+`
+},
+{
+  h:'Covariance & Correlation',
+  p:`
+
+<h3>1. Covariance</h3>
+
+$$
+Cov(X,Y) = E[(X - \\mu_X)(Y - \\mu_Y)]
+$$
+
+Alternative:
+
+$$
+Cov(X,Y) = E[XY] - E[X]E[Y]
+$$
+
+<h3>2. Correlation</h3>
+
+$$
+\\rho_{XY}
+=
+\\frac{Cov(X,Y)}{\\sigma_X \\sigma_Y}
+$$
+
+Range:
+
+$$
+-1 \\le \\rho \\le 1
+$$
+
+<h3>3. Interpretation</h3>
+
+Covariance captures joint variability.  
+Correlation standardizes it.
+
+`
+},
+{
+  h:'Moment Generating Functions',
+  p:`
+
+<h3>1. Definition</h3>
+
+$$
+M_X(t) = E[e^{tX}]
+$$
+
+<h3>2. Moments</h3>
+
+$$
+E[X^n] = M_X^{(n)}(0)
+$$
+
+<h3>3. Independence Property</h3>
+
+If $X$ and $Y$ independent:
+
+$$
+M_{X+Y}(t) = M_X(t) M_Y(t)
+$$
+
+<h3>4. Importance</h3>
+
+Used to prove Central Limit Theorem.
+
+`
+},
+{
+  h:'Key Distributions',
+  p:`
+
+<h3>1. Bernoulli</h3>
+
+$$
+P(X=1)=p
+$$
+
+<h3>2. Binomial</h3>
+
+$$
+P(X=k)=\\binom{n}{k}p^k(1-p)^{n-k}
+$$
+
+<h3>3. Poisson</h3>
+
+$$
+P(X=k)=\\frac{\\lambda^k e^{-\\lambda}}{k!}
+$$
+
+<h3>4. Normal</h3>
+
+$$
+f(x)=\\frac{1}{\\sqrt{2\\pi \\sigma^2}}
+e^{-(x-\\mu)^2/(2\\sigma^2)}
+$$
+
+<h3>5. Multivariate Normal</h3>
+
+$$
+f(x)
+=
+\\frac{1}{(2\\pi)^{n/2}|\\Sigma|^{1/2}}
+e^{-\\frac{1}{2}(x-\\mu)^T\\Sigma^{-1}(x-\\mu)}
+$$
+
+`
+}
+    ]},
+    { title:'Multivariate Statisticss', items:[
+      {
+  h:'Joint Distributions',
+  p:`
+
+<h3>1. Definition</h3>
+
+For two random variables $X, Y$:
+
+Discrete case:
+
+$$
+p(x,y) = P(X=x, Y=y)
+$$
+
+Continuous case:
+
+$$
+f(x,y)
+$$
+
+with:
+
+$$
+\\int \\int f(x,y) dx dy = 1
+$$
+
+<h3>2. Interpretation</h3>
+
+Joint distributions describe the full probabilistic relationship between variables.
+
+`
+},
+{
+  h:'Marginal & Conditional Distributions',
+  p:`
+
+<h3>1. Marginal Distribution</h3>
+
+Discrete:
+
+$$
+P(X=x) = \\sum_y P(X=x,Y=y)
+$$
+
+Continuous:
+
+$$
+f_X(x) = \\int f(x,y) dy
+$$
+
+<h3>2. Conditional Distribution</h3>
+
+Discrete:
+
+$$
+P(X=x \\mid Y=y)
+=
+\\frac{P(X=x,Y=y)}{P(Y=y)}
+$$
+
+Continuous:
+
+$$
+f_{X|Y}(x|y)
+=
+\\frac{f(x,y)}{f_Y(y)}
+$$
+
+<h3>3. Interpretation</h3>
+
+Marginalization integrates out unwanted variables.
+
+Conditioning restricts the distribution.
+
+`
+},
+{
+  h:'Covariance Matrix',
+  p:`
+
+<h3>1. Definition</h3>
+
+For vector random variable:
+
+$$
+X =
+\\begin{bmatrix}
+X_1 \\\\
+\\vdots \\\\
+X_n
+\\end{bmatrix}
+$$
+
+Covariance matrix:
+
+$$
+\\Sigma = E[(X - \\mu)(X - \\mu)^T]
+$$
+
+<h3>2. Properties</h3>
+
+<ul>
+<li>Symmetric</li>
+<li>Positive semi-definite</li>
+<li>Diagonal entries = variances</li>
+<li>Off-diagonal entries = covariances</li>
+</ul>
+
+<h3>3. Interpretation</h3>
+
+Covariance matrix encodes geometry of data distribution.
+
+`,
+},
+{
+  h:'Multivariate Normal Distribution',
+  p:`
+
+<h3>1. Definition</h3>
+
+$$
+X \\sim \\mathcal{N}(\\mu, \\Sigma)
+$$
+
+Density:
+
+$$
+f(x)
+=
+\\frac{1}{(2\\pi)^{n/2} |\\Sigma|^{1/2}}
+\\exp\\left(
+-\\frac{1}{2}
+(x-\\mu)^T \\Sigma^{-1} (x-\\mu)
+\\right)
+$$
+
+<h3>2. Key Properties</h3>
+
+<ul>
+<li>Linear transformations preserve normality</li>
+<li>Marginals are normal</li>
+<li>Conditionals are normal</li>
+</ul>
+
+<h3>3. Geometry</h3>
+
+Level sets:
+
+$$
+(x-\\mu)^T \\Sigma^{-1} (x-\\mu) = c
+$$
+
+These are ellipsoids.
+
+`,
+},
+{
+  h:'Correlation Structure',
+  p:`
+
+<h3>1. Correlation Matrix</h3>
+
+$$
+R_{ij}
+=
+\\frac{\\Sigma_{ij}}
+{\\sqrt{\\Sigma_{ii}\\Sigma_{jj}}}
+$$
+
+<h3>2. Standardization</h3>
+
+Correlation removes scale effects.
+
+<h3>3. Importance</h3>
+
+Correlation matrix used in:
+
+<ul>
+<li>PCA</li>
+<li>Factor analysis</li>
+<li>Feature selection</li>
+</ul>
+
+`,
+},
+{
+  h:'Independence vs Uncorrelated',
+  p:`
+
+<h3>1. Independence</h3>
+
+$$
+f(x,y) = f_X(x) f_Y(y)
+$$
+
+<h3>2. Uncorrelated</h3>
+
+$$
+Cov(X,Y) = 0
+$$
+
+<h3>3. Key Difference</h3>
+
+Independence ⇒ Uncorrelated  
+
+But:
+
+Uncorrelated ⇏ Independent (in general)
+
+Exception: For multivariate normal distribution,
+uncorrelated implies independence.
+
+`,
+}
+    ]},
+    { title:'Statistical Estimation', items:[
+      {
+  h:'Point Estimation',
+  p:`
+
+<h3>1. Parameter vs Estimator</h3>
+
+Let data:
+
+$$
+X_1, ..., X_n \\sim f(x; \\theta)
+$$
+
+where $\\theta$ is unknown parameter.
+
+An estimator:
+
+$$
+\\hat{\\theta} = g(X_1,...,X_n)
+$$
+
+is a random variable.
+
+<hr>
+
+<h3>2. Sample Mean</h3>
+
+$$
+\\bar{X} = \\frac{1}{n} \\sum_{i=1}^n X_i
+$$
+
+Properties:
+
+$$
+E[\\bar{X}] = \\mu
+$$
+
+$$
+Var(\\bar{X}) = \\frac{\\sigma^2}{n}
+$$
+
+`
+},
+{
+  h:'Maximum Likelihood Estimation (MLE)',
+  p:`
+
+<h3>1. Likelihood Function</h3>
+
+For iid data:
+
+$$
+L(\\theta)
+=
+\\prod_{i=1}^n f(X_i; \\theta)
+$$
+
+Log-likelihood:
+
+$$
+\\ell(\\theta)
+=
+\\sum_{i=1}^n \\log f(X_i; \\theta)
+$$
+
+<hr>
+
+<h3>2. MLE Definition</h3>
+
+$$
+\\hat{\\theta}_{MLE}
+=
+\\arg\\max_\\theta L(\\theta)
+$$
+
+<hr>
+
+<h3>3. Example: Normal Mean</h3>
+
+If $X_i \\sim \\mathcal{N}(\\mu, \\sigma^2)$:
+
+$$
+\\hat{\\mu}_{MLE} = \\bar{X}
+$$
+
+<hr>
+
+<h3>4. Importance</h3>
+
+MLE underlies:
+
+<ul>
+<li>Linear regression</li>
+<li>Logistic regression</li>
+<li>Neural network training</li>
+<li>Gaussian models</li>
+</ul>
+
+`,
+},
+{
+  h:'Method of Moments',
+  p:`
+
+<h3>1. Idea</h3>
+
+Match theoretical moments with sample moments.
+
+$$
+E[X^k] = m_k(\\theta)
+$$
+
+Set equal to:
+
+$$
+\\frac{1}{n} \\sum X_i^k
+$$
+
+Solve for $\\theta$.
+
+<hr>
+
+<h3>2. Example</h3>
+
+For exponential distribution:
+
+$$
+E[X] = \\frac{1}{\\lambda}
+$$
+
+Estimator:
+
+$$
+\\hat{\\lambda} = \\frac{1}{\\bar{X}}
+$$
+
+`,
+},
+{
+  h:'Bias & Variance of Estimators',
+  p:`
+
+<h3>1. Bias</h3>
+
+$$
+Bias(\\hat{\\theta})
+=
+E[\\hat{\\theta}] - \\theta
+$$
+
+Unbiased if bias = 0.
+
+<hr>
+
+<h3>2. Variance</h3>
+
+Measures estimator variability.
+
+<hr>
+
+<h3>3. Mean Squared Error</h3>
+
+$$
+MSE(\\hat{\\theta})
+=
+Var(\\hat{\\theta}) + Bias(\\hat{\\theta})^2
+$$
+
+<h3>4. Bias–Variance Tradeoff</h3>
+
+Central concept in ML generalization.
+
+`,
+},
+{
+  h:'Consistency',
+  p:`
+
+An estimator is consistent if:
+
+$$
+\\hat{\\theta}_n \\to \\theta
+$$
+
+as:
+
+$$
+n \\to \\infty
+$$
+
+Formally:
+
+$$
+\\hat{\\theta}_n
+\\xrightarrow{P}
+\\theta
+$$
+
+(Convergence in probability)
+
+`,
+},
+ {
+  h:'Efficiency & Cramér–Rao Bound',
+  p:`
+
+<h3>1. Fisher Information</h3>
+
+$$
+I(\\theta)
+=
+E\\left[
+\\left(
+\\frac{\\partial}{\\partial \\theta}
+\\log f(X;\\theta)
+\\right)^2
+\\right]
+$$
+
+<h3>2. Cramér–Rao Lower Bound</h3>
+
+For unbiased estimator:
+
+$$
+Var(\\hat{\\theta})
+\\ge
+\\frac{1}{n I(\\theta)}
+$$
+
+<h3>3. Efficient Estimator</h3>
+
+Achieves CRLB.
+
+Normal mean MLE is efficient.
+
+`,
+}    
+    ]},
+    { title:'Sampling Theory & Asymptotics', items:[
+      {
+  h:'Sampling Distributions',
+  p:`
+
+<h3>1. Definition</h3>
+
+A sampling distribution is the distribution of an estimator.
+
+Example:
+
+$$
+\\bar{X} = \\frac{1}{n} \\sum_{i=1}^n X_i
+$$
+
+If:
+
+$$
+X_i \\sim (\\mu, \\sigma^2)
+$$
+
+Then:
+
+$$
+E[\\bar{X}] = \\mu
+$$
+
+$$
+Var(\\bar{X}) = \\frac{\\sigma^2}{n}
+$$
+
+<h3>2. Importance</h3>
+
+Sampling distributions quantify estimator uncertainty.
+
+`,
+},
+{
+  h:'Law of Large Numbers',
+  p:`
+
+<h3>1. Weak Law</h3>
+
+If $X_i$ iid with mean $\\mu$:
+
+$$
+\\bar{X}_n
+\\xrightarrow{P}
+\\mu
+$$
+
+as $n \\to \\infty$.
+
+<h3>2. Interpretation</h3>
+
+Sample mean converges to true mean.
+
+<h3>3. Why Important</h3>
+
+Ensures empirical averages approximate expectations.
+
+Foundation of empirical risk minimization in ML.
+
+`,
+},
+{
+  h:'Central Limit Theorem',
+  p:`
+
+<h3>1. Statement</h3>
+
+If $X_i$ iid with mean $\\mu$ and variance $\\sigma^2$:
+
+$$
+\\frac{
+\\bar{X}_n - \\mu
+}{
+\\sigma / \\sqrt{n}
+}
+\\xrightarrow{d}
+\\mathcal{N}(0,1)
+$$
+
+<h3>2. Meaning</h3>
+
+For large $n$:
+
+$$
+\\bar{X}_n
+\\approx
+\\mathcal{N}
+\\left(
+\\mu,
+\\frac{\\sigma^2}{n}
+\\right)
+$$
+
+<h3>3. Importance</h3>
+
+Justifies:
+
+<ul>
+<li>Confidence intervals</li>
+<li>Z-tests</li>
+<li>Asymptotic normality of MLE</li>
+</ul>
+
+`,
+},
+{
+  h:'Slutsky’s Theorem',
+  p:`
+
+If:
+
+$$
+X_n \\xrightarrow{d} X
+$$
+
+and
+
+$$
+Y_n \\xrightarrow{P} c
+$$
+
+Then:
+
+$$
+X_n Y_n \\xrightarrow{d} cX
+$$
+
+Used to combine asymptotic results.
+
+Essential in proving asymptotic normality of estimators.
+
+`,
+},
+{
+  h:'Delta Method',
+  p:`
+
+<h3>1. Idea</h3>
+
+If:
+
+$$
+\\sqrt{n}(\\hat{\\theta} - \\theta)
+\\xrightarrow{d}
+\\mathcal{N}(0, \\sigma^2)
+$$
+
+Then for smooth function $g$:
+
+$$
+\\sqrt{n}
+(g(\\hat{\\theta}) - g(\\theta))
+\\xrightarrow{d}
+\\mathcal{N}
+\\left(
+0,
+[g'(\\theta)]^2 \\sigma^2
+\\right)
+$$
+
+<h3>2. Interpretation</h3>
+
+Propagates asymptotic normality through transformations.
+
+<h3>3. Use</h3>
+
+Confidence intervals for nonlinear parameters.
+
+`,
+}
+    ]},
+    { title:'Hypothesis Testing', items:[
+      {
+  h:'Null & Alternative Hypotheses',
+  p:`
+
+<h3>1. Structure</h3>
+
+Null hypothesis:
+
+$$
+H_0
+$$
+
+Alternative hypothesis:
+
+$$
+H_1
+$$
+
+Example:
+
+$$
+H_0: \\mu = \\mu_0
+$$
+
+$$
+H_1: \\mu \\ne \\mu_0
+$$
+
+<h3>2. Two-Sided vs One-Sided</h3>
+
+Two-sided:
+
+$$
+\\mu \\ne \\mu_0
+$$
+
+One-sided:
+
+$$
+\\mu > \\mu_0
+$$
+
+or
+
+$$
+\\mu < \\mu_0
+$$
+
+`,
+},
+{
+  h:'Type I & Type II Errors',
+  p:`
+
+<h3>1. Type I Error</h3>
+
+Reject $H_0$ when true.
+
+Probability:
+
+$$
+\\alpha
+$$
+
+<h3>2. Type II Error</h3>
+
+Fail to reject $H_0$ when false.
+
+Probability:
+
+$$
+\\beta
+$$
+
+<h3>3. Power</h3>
+
+$$
+1 - \\beta
+$$
+
+Higher power = better test.
+
+`,
+},
+{
+  h:'p-values',
+  p:`
+
+<h3>1. Definition</h3>
+
+p-value = probability of observing statistic as extreme or more extreme under $H_0$.
+
+<h3>2. Decision Rule</h3>
+
+Reject $H_0$ if:
+
+$$
+p < \\alpha
+$$
+
+<h3>3. Interpretation</h3>
+
+p-value is not probability that $H_0$ is true.
+
+`,
+},
+{
+  h:'Z-Test',
+  p:`
+
+Used when variance known or large sample.
+
+Statistic:
+
+$$
+Z
+=
+\\frac{
+\\bar{X} - \\mu_0
+}{
+\\sigma / \\sqrt{n}
+}
+$$
+
+Under $H_0$:
+
+$$
+Z \\sim \\mathcal{N}(0,1)
+$$
+
+`,
+},
+{
+  h:'t-Test',
+  p:`
+
+Used when variance unknown.
+
+Statistic:
+
+$$
+T
+=
+\\frac{
+\\bar{X} - \\mu_0
+}{
+S / \\sqrt{n}
+}
+$$
+
+Follows:
+
+$$
+t_{n-1}
+$$
+
+distribution.
+
+`,
+},
+{
+  h:'Chi-Square Test',
+  p:`
+
+<h3>1. Goodness-of-Fit</h3>
+
+$$
+\\chi^2
+=
+\\sum
+\\frac{(O_i - E_i)^2}{E_i}
+$$
+
+<h3>2. Independence Test</h3>
+
+Used in contingency tables.
+
+`,
+},
+{
+  h:'Likelihood Ratio Test',
+  p:`
+
+Test statistic:
+
+$$
+\\Lambda
+=
+\\frac{
+\\sup_{\\theta \\in \\Theta_0} L(\\theta)
+}{
+\\sup_{\\theta \\in \\Theta} L(\\theta)
+}
+$$
+
+Asymptotically:
+
+$$
+-2 \\log \\Lambda
+\\sim
+\\chi^2
+$$
+
+`,
+},
+{
+  h:'Power Analysis',
+  p:`
+
+Power:
+
+$$
+1 - \\beta
+$$
+
+Depends on:
+
+<ul>
+<li>Effect size</li>
+<li>Sample size</li>
+<li>Variance</li>
+<li>Significance level</li>
+</ul>
+
+Used to determine required sample size.
+
+`,
+}
+    ]},
+    { title:'Regression & Statistical Modeling', items:[
+      {
+  h:'Simple Linear Regression',
+  p:`
+
+<h3>1. Model</h3>
+
+$$
+Y = \\beta_0 + \\beta_1 X + \\epsilon
+$$
+
+where:
+
+$$
+E[\\epsilon] = 0, \\quad Var(\\epsilon)=\\sigma^2
+$$
+
+<h3>2. Least Squares Estimator</h3>
+
+Minimize:
+
+$$
+\\sum (Y_i - \\hat{Y}_i)^2
+$$
+
+Solution:
+
+$$
+\\hat{\\beta}_1
+=
+\\frac{Cov(X,Y)}{Var(X)}
+$$
+
+$$
+\\hat{\\beta}_0
+=
+\\bar{Y} - \\hat{\\beta}_1 \\bar{X}
+$$
+
+<h3>3. Interpretation</h3>
+
+Slope measures linear association.
+
+`,
+},
+{
+  h:'Multiple Linear Regression',
+  p:`
+
+<h3>1. Model (Matrix Form)</h3>
+
+$$
+Y = X\\beta + \\epsilon
+$$
+
+where:
+
+<ul>
+<li>$X$ = design matrix</li>
+<li>$\\beta$ = parameter vector</li>
+</ul>
+
+<h3>2. Least Squares Solution</h3>
+
+$$
+\\hat{\\beta}
+=
+(X^T X)^{-1} X^T Y
+$$
+
+<h3>3. Assumptions</h3>
+
+<ul>
+<li>Linearity</li>
+<li>Homoscedasticity</li>
+<li>Independence</li>
+<li>No perfect multicollinearity</li>
+</ul>
+
+`,
+},
+{
+  h:'Gauss–Markov Theorem',
+  p:`
+
+Under classical linear model assumptions:
+
+$$
+\\hat{\\beta}
+=
+(X^T X)^{-1} X^T Y
+$$
+
+is the <b>Best Linear Unbiased Estimator (BLUE)</b>.
+
+Meaning:
+
+It has minimum variance among all linear unbiased estimators.
+
+`,
+},
+{
+  h:'ANOVA',
+  p:`
+
+Total variability:
+
+$$
+SST = SSR + SSE
+$$
+
+Where:
+
+<ul>
+<li>SSR = regression sum of squares</li>
+<li>SSE = error sum of squares</li>
+</ul>
+
+F-statistic:
+
+$$
+F = \\frac{SSR / p}{SSE / (n-p-1)}
+$$
+
+Used to test overall model significance.
+
+`,
+},
+{
+  h:'Logistic Regression',
+  p:`
+
+<h3>1. Model</h3>
+
+$$
+P(Y=1|X)
+=
+\\frac{
+1
+}{
+1 + e^{-X\\beta}
+}
+$$
+
+<h3>2. Log-Likelihood</h3>
+
+$$
+\\ell(\\beta)
+=
+\\sum
+\\left[
+y_i \\log p_i
++
+(1-y_i) \\log (1-p_i)
+\\right]
+$$
+
+<h3>3. Estimation</h3>
+
+No closed-form solution.
+
+Use gradient ascent / descent.
+
+`,
+},
+{
+  h:'Residual Analysis',
+  p:`
+
+Residual:
+
+$$
+e_i = Y_i - \\hat{Y}_i
+$$
+
+Check for:
+
+<ul>
+<li>Normality</li>
+<li>Homoscedasticity</li>
+<li>Outliers</li>
+<li>Influential points</li>
+</ul>
+
+`,
+},
+{
+  h:'Multicollinearity',
+  p:`
+
+Occurs when predictors are highly correlated.
+
+Consequences:
+
+<ul>
+<li>Unstable coefficients</li>
+<li>High variance</li>
+<li>Poor interpretability</li>
+</ul>
+
+Variance Inflation Factor (VIF):
+
+$$
+VIF_j
+=
+\\frac{1}{1 - R_j^2}
+$$
+
+`,
+},
+{
+  h:'Model Diagnostics',
+  p:`
+
+Check:
+
+<ul>
+<li>R-squared</li>
+<li>Adjusted R-squared</li>
+<li>AIC / BIC</li>
+<li>Cross-validation error</li>
+</ul>
+
+Goal:
+
+Balance bias and variance.
+
+`,
+}
+    ]},
+    { title:'Bayesian Statistics', items:[
+      {
+  h:'Prior, Likelihood & Posterior',
+  p:`
+
+<h3>1. Bayes Rule (Parameter Form)</h3>
+
+$$
+p(\\theta | x)
+=
+\\frac{
+p(x | \\theta) p(\\theta)
+}{
+p(x)
+}
+$$
+
+<h3>2. Components</h3>
+
+<ul>
+<li><b>Prior</b> $p(\\theta)$ — belief before data</li>
+<li><b>Likelihood</b> $p(x|\\theta)$ — data model</li>
+<li><b>Posterior</b> $p(\\theta|x)$ — updated belief</li>
+<li><b>Evidence</b> $p(x)$ — normalization constant</li>
+</ul>
+
+<h3>3. Interpretation</h3>
+
+Posterior ∝ Likelihood × Prior
+
+`,
+},
+{
+  h:'Conjugate Priors',
+  p:`
+
+A prior is conjugate if posterior belongs to same family.
+
+<h3>Example: Beta–Binomial</h3>
+
+Likelihood:
+
+$$
+X \\sim Binomial(n, p)
+$$
+
+Prior:
+
+$$
+p \\sim Beta(\\alpha, \\beta)
+$$
+
+Posterior:
+
+$$
+p | X
+\\sim
+Beta(\\alpha + x, \\beta + n - x)
+$$
+
+<h3>Benefit</h3>
+
+Closed-form posterior.
+
+`,
+},
+{
+  h:'Beta–Binomial Model',
+  p:`
+
+Posterior mean:
+
+$$
+E[p | X]
+=
+\\frac{\\alpha + x}{\\alpha + \\beta + n}
+$$
+
+Shows shrinkage toward prior.
+
+Used in:
+
+<ul>
+<li>A/B testing</li>
+<li>Conversion rate estimation</li>
+</ul>
+
+`,
+},
+{
+  h:'Gaussian–Gaussian Model',
+  p:`
+
+Likelihood:
+
+$$
+X_i \\sim \\mathcal{N}(\\mu, \\sigma^2)
+$$
+
+Prior:
+
+$$
+\\mu \\sim \\mathcal{N}(\\mu_0, \\tau^2)
+$$
+
+Posterior:
+
+$$
+\\mu | X
+\\sim
+\\mathcal{N}
+\\left(
+\\mu_n,
+\\tau_n^2
+\\right)
+$$
+
+Posterior mean:
+
+Weighted average of prior mean and sample mean.
+
+`,
+},
+{
+  h:'MAP Estimation',
+  p:`
+
+Maximum a posteriori:
+
+$$
+\\hat{\\theta}_{MAP}
+=
+\\arg\\max_\\theta
+p(\\theta | x)
+$$
+
+Equivalent to:
+
+$$
+\\arg\\max_\\theta
+\\left[
+\\log L(\\theta)
++
+\\log p(\\theta)
+\\right]
+$$
+
+Connection:
+
+<ul>
+<li>Gaussian prior ⇒ L2 regularization</li>
+<li>Laplace prior ⇒ L1 regularization</li>
+</ul>
+
+`,
+},
+{
+  h:'Posterior Predictive Distribution',
+  p:`
+
+Predict future observation:
+
+$$
+p(x_{new} | x)
+=
+\\int
+p(x_{new} | \\theta)
+p(\\theta | x)
+d\\theta
+$$
+
+Accounts for parameter uncertainty.
+
+`,
+},
+{
+  h:'Markov Chain Monte Carlo (Conceptual)',
+  p:`
+
+Used when posterior not analytically tractable.
+
+Idea:
+
+Construct Markov chain whose stationary distribution is posterior.
+
+Common methods:
+
+<ul>
+<li>Metropolis–Hastings</li>
+<li>Gibbs sampling</li>
+</ul>
+
+Used in:
+
+<ul>
+<li>Hierarchical models</li>
+<li>Bayesian neural networks</li>
+</ul>
+
+`,
+}
+    ]},
+    { title:'Advanced Topics (For Mastery)', items:[
+      {
+  h:'Information Theory',
+  p:`
+
+<h3>1. Entropy</h3>
+
+For discrete random variable:
+
+$$
+H(X)
+=
+- \\sum_x p(x) \\log p(x)
+$$
+
+Measures uncertainty.
+
+<h3>2. Joint Entropy</h3>
+
+$$
+H(X,Y)
+$$
+
+<h3>3. Conditional Entropy</h3>
+
+$$
+H(X|Y)
+=
+H(X,Y) - H(Y)
+$$
+
+<h3>4. KL Divergence</h3>
+
+$$
+D_{KL}(P||Q)
+=
+\\sum_x
+P(x)
+\\log
+\\frac{P(x)}{Q(x)}
+$$
+
+Measures difference between distributions.
+
+<h3>5. Mutual Information</h3>
+
+$$
+I(X;Y)
+=
+H(X) - H(X|Y)
+$$
+
+Used in feature selection.
+
+`,
+},
+{
+  h:'Cross-Entropy Loss',
+  p:`
+
+For true distribution $P$ and model $Q$:
+
+$$
+H(P,Q)
+=
+- \\sum P(x) \\log Q(x)
+$$
+
+Relationship:
+
+$$
+H(P,Q)
+=
+H(P)
++
+D_{KL}(P||Q)
+$$
+
+Minimizing cross-entropy minimizes KL divergence.
+
+Used in:
+
+<ul>
+<li>Logistic regression</li>
+<li>Neural networks</li>
+</ul>
+
+`,
+},
+{
+  h:'Maximum Entropy Principle',
+  p:`
+
+Choose distribution maximizing entropy subject to constraints.
+
+Example:
+
+Given mean constraint:
+
+Max entropy distribution is Gaussian.
+
+Used in:
+
+<ul>
+<li>Exponential family models</li>
+<li>Logistic regression</li>
+</ul>
+
+`,
+},
+{
+  h:'Expectation–Maximization (EM)',
+  p:`
+
+Used for latent variable models.
+
+<h3>1. E-Step</h3>
+
+Compute:
+
+$$
+E[\\log L(\\theta)]
+$$
+
+with respect to hidden variables.
+
+<h3>2. M-Step</h3>
+
+Maximize expected log-likelihood.
+
+Used in:
+
+<ul>
+<li>Gaussian Mixture Models</li>
+<li>Hidden Markov Models</li>
+</ul>
+
+`,
+},
+{
+  h:'Bootstrapping',
+  p:`
+
+Resampling with replacement.
+
+Algorithm:
+
+1. Sample with replacement
+2. Compute statistic
+3. Repeat many times
+
+Used for:
+
+<ul>
+<li>Confidence intervals</li>
+<li>Variance estimation</li>
+</ul>
+
+`,
+},
+{
+  h:'Resampling Methods',
+  p:`
+
+Includes:
+
+<ul>
+<li>Cross-validation</li>
+<li>Jackknife</li>
+<li>Bootstrap</li>
+</ul>
+
+Used for:
+
+<ul>
+<li>Model evaluation</li>
+<li>Bias correction</li>
+<li>Hyperparameter tuning</li>
+</ul>
+
+`,
+},
+{
+  h:'Time Series Basics',
+  p:`
+
+<h3>1. Stationarity</h3>
+
+Mean and variance constant over time.
+
+<h3>2. Autocovariance</h3>
+
+$$
+\\gamma(k)
+=
+Cov(X_t, X_{t+k})
+$$
+
+<h3>3. AR(1) Model</h3>
+
+$$
+X_t = \\phi X_{t-1} + \\epsilon_t
+$$
+
+<h3>4. Importance</h3>
+
+Used in:
+
+<ul>
+<li>Forecasting</li>
+<li>Financial modeling</li>
+</ul>
+
+`,
+},
+]}
+   
+]},
+  linearalgebra: { label:'01b — Linear Algebra', title:'Linear Algebra', sections:[
+    { title:'Vector Foundation', items:[
+      {
+  h:'Vector Operations',
+  p:`
+<h3>1. Vectors in ℝⁿ</h3>
+
+<p>
+A vector in $\\mathbb{R}^n$ is an ordered tuple:
+</p>
+
+$$
+v = (v_1, v_2, ..., v_n)
+$$
+
+<p>
+Vectors represent elements of a vector space and encode magnitude and direction.
+Geometrically, they are directed displacements.
+Algebraically, they obey linear structure.
+</p>
+
+<hr>
+
+<h3>2. Vector Addition</h3>
+
+$$
+(u + v)_i = u_i + v_i
+$$
+
+<p><b>Properties:</b></p>
+<ul>
+<li>Commutative: $u+v=v+u$</li>
+<li>Associative</li>
+<li>Identity: $u+0=u$</li>
+<li>Inverse: $u + (-u)=0$</li>
+</ul>
+
+<h4>Geometric Meaning</h4>
+<p>
+Vector addition corresponds to translation in space.
+</p>
+
+<hr>
+
+<h3>3. Scalar Multiplication</h3>
+
+$$
+(\\alpha v)_i = \\alpha v_i
+$$
+
+$$
+||\\alpha v|| = |\\alpha| ||v||
+$$
+
+<p>
+Scalar multiplication scales magnitude and possibly reverses direction.
+</p>
+
+<hr>
+
+<h3>4. Dot Product</h3>
+
+$$
+u \\cdot v = \\sum_{i=1}^n u_i v_i
+$$
+
+$$
+u \\cdot v = ||u|| ||v|| \\cos \\theta
+$$
+
+<h4>Projection</h4>
+
+$$
+\\text{proj}_v(u) = \\frac{u \\cdot v}{||v||^2} v
+$$
+
+<p>
+Dot product measures directional similarity and defines angle.
+</p>
+
+<hr>
+
+<h3>5. Cauchy–Schwarz Inequality</h3>
+
+$$
+|u \\cdot v| \\le ||u|| ||v||
+$$
+
+<p>
+Equality holds iff vectors are linearly dependent.
+</p>
+
+`
+},
+      {
+  h:'Norms',
+  p:`
+
+<h3>1. Definition of a Norm</h3>
+
+<p>
+A norm is a function $||\\cdot|| : V \\to \\mathbb{R}$ satisfying:
+</p>
+
+<ul>
+<li>Positivity: $||v|| \\ge 0$ and $||v||=0 \\iff v=0$</li>
+<li>Homogeneity: $||\\alpha v|| = |\\alpha| ||v||$</li>
+<li>Triangle inequality: $||u+v|| \\le ||u|| + ||v||$</li>
+</ul>
+
+<hr>
+
+<h3>2. Common Norms in ℝⁿ</h3>
+
+<h4>Euclidean Norm (L2)</h4>
+
+$$
+||v||_2 = \\sqrt{\\sum v_i^2}
+$$
+
+<h4>L1 Norm</h4>
+
+$$
+||v||_1 = \\sum |v_i|
+$$
+
+<h4>Infinity Norm</h4>
+
+$$
+||v||_\\infty = \\max |v_i|
+$$
+
+<hr>
+
+<h3>3. Distance Induced by Norm</h3>
+
+$$
+d(u,v) = ||u-v||
+$$
+
+<p>
+Norms induce metric structure and define geometry.
+</p>
+
+<hr>
+
+<h3>4. Norm Equivalence</h3>
+
+<p>
+In finite dimensions, all norms are equivalent:
+</p>
+
+$$
+c_1 ||v||_a \\le ||v||_b \\le c_2 ||v||_a
+$$
+
+<p>
+for some positive constants $c_1, c_2$.
+</p>
+
+<hr>
+
+<h3>ML Interpretation</h3>
+
+<ul>
+<li>L2 → smooth shrinkage (Ridge)</li>
+<li>L1 → sparsity (Lasso)</li>
+<li>Norm constraints define regularisation</li>
+</ul>
+
+`
+},
+{
+  h:'Inner Products',
+  p:`
+
+<h3>1. Definition</h3>
+
+<p>
+An inner product on vector space $V$ is a function:
+</p>
+
+$$
+\\langle u, v \\rangle : V \\times V \\to \\mathbb{R}
+$$
+
+<p>
+satisfying:
+</p>
+
+<ul>
+<li>Symmetry: $\\langle u,v \\rangle = \\langle v,u \\rangle$</li>
+<li>Linearity in first argument</li>
+<li>Positive definiteness</li>
+</ul>
+
+<hr>
+
+<h3>2. Standard Inner Product</h3>
+
+$$
+\\langle u, v \\rangle = \\sum u_i v_i
+$$
+
+Norm induced by inner product:
+
+$$
+||v|| = \\sqrt{\\langle v, v \\rangle}
+$$
+
+<hr>
+
+<h3>3. Orthogonality</h3>
+
+$$
+\\langle u, v \\rangle = 0
+$$
+
+<p>
+Vectors are orthogonal if their inner product is zero.
+</p>
+
+<hr>
+
+<h3>4. Angle Between Vectors</h3>
+
+$$
+\\cos \\theta = \\frac{\\langle u, v \\rangle}{||u|| ||v||}
+$$
+
+<hr>
+
+<h3>5. Parallelogram Law</h3>
+
+$$
+||u+v||^2 + ||u-v||^2 = 2||u||^2 + 2||v||^2
+$$
+
+<p>
+This characterizes norms induced by inner products.
+</p>
+
+<hr>
+
+<h3>6. Importance in ML</h3>
+
+<ul>
+<li>Cosine similarity</li>
+<li>Kernel methods</li>
+<li>Feature embeddings</li>
+<li>Hilbert space interpretation of models</li>
+</ul>
+
+`
+}
+
+    ]},
+    { title:'Structure of Vector Spacess', items:[
+      {
+  h:'Vector Spaces',
+  p:`
+
+<h3>1. Formal Definition</h3>
+
+<p>
+A <b>vector space</b> $V$ over a field $\\mathbb{F}$ (usually $\\mathbb{R}$)
+is a set equipped with:
+</p>
+
+<ul>
+<li>Vector addition</li>
+<li>Scalar multiplication</li>
+</ul>
+
+<p>
+satisfying ten axioms ensuring linear structure.
+</p>
+
+<h4>Core Axioms</h4>
+
+<ul>
+<li>Closure under addition</li>
+<li>Closure under scalar multiplication</li>
+<li>Commutativity of addition</li>
+<li>Associativity of addition</li>
+<li>Existence of zero vector</li>
+<li>Existence of additive inverse</li>
+<li>Distributivity over vector addition</li>
+<li>Distributivity over scalar addition</li>
+<li>Associativity of scalar multiplication</li>
+<li>Multiplicative identity: $1v = v$</li>
+</ul>
+
+<hr>
+
+<h3>2. Examples</h3>
+
+<ul>
+<li>$\\mathbb{R}^n$</li>
+<li>Polynomial space $P_n$</li>
+<li>Matrix space $\\mathbb{R}^{m \\times n}$</li>
+<li>Continuous functions $C[a,b]$</li>
+</ul>
+
+<p>
+The abstraction allows linear algebra to extend beyond geometry.
+</p>
+
+`
+},
+      {
+  h:'Subspaces',
+  p:`
+
+<h3>1. Definition</h3>
+
+<p>
+A subset $W \\subseteq V$ is a <b>subspace</b> if:
+</p>
+
+<ul>
+<li>$0 \\in W$</li>
+<li>Closed under addition</li>
+<li>Closed under scalar multiplication</li>
+</ul>
+
+<hr>
+
+<h3>2. Subspace Test</h3>
+
+<p>
+To verify $W$ is a subspace, it is sufficient to check:
+</p>
+
+$$
+u,v \\in W \\Rightarrow u+v \\in W
+$$
+
+$$
+\\alpha u \\in W
+$$
+
+<hr>
+
+<h3>3. Geometric Interpretation</h3>
+
+In $\\mathbb{R}^3$, subspaces are:
+
+<ul>
+<li>The origin</li>
+<li>Lines through the origin</li>
+<li>Planes through the origin</li>
+<li>The entire space</li>
+</ul>
+
+<hr>
+
+<h3>4. Column Space & Null Space</h3>
+
+<p>
+Important examples of subspaces:
+</p>
+
+$$
+\\text{Col}(A)
+$$
+
+$$
+\\text{Null}(A)
+$$
+
+These will be central in later sections.
+
+`
+},
+{
+  h:'Linear Independence',
+  p:`
+
+<h3>1. Definition</h3>
+
+Vectors $v_1,...,v_k$ are linearly independent if:
+
+$$
+\\alpha_1 v_1 + ... + \\alpha_k v_k = 0
+$$
+
+implies
+
+$$
+\\alpha_1 = ... = \\alpha_k = 0
+$$
+
+<hr>
+
+<h3>2. Dependence Criterion</h3>
+
+Vectors are dependent if at least one can be written as:
+
+$$
+v_i = \\sum_{j \\ne i} \\alpha_j v_j
+$$
+
+<hr>
+
+<h3>3. Matrix View</h3>
+
+Let $A$ have columns $v_i$.
+
+Vectors independent ⇔
+
+$$
+\\text{rank}(A) = k
+$$
+
+<hr>
+
+<h3>4. Determinant Test (Square Case)</h3>
+
+$$
+\\det(A) \\ne 0
+$$
+
+<hr>
+
+<h3>5. Geometric Meaning</h3>
+
+<ul>
+<li>Independent vectors expand dimensionality.</li>
+<li>Dependent vectors lie in lower-dimensional subspace.</li>
+</ul>
+
+`
+},
+{
+  h:'Basis & Dimension',
+  p:`
+
+<h3>1. Basis</h3>
+
+A set of vectors is a <b>basis</b> if:
+
+<ul>
+<li>It spans the space</li>
+<li>It is linearly independent</li>
+</ul>
+
+<hr>
+
+<h3>2. Uniqueness of Representation</h3>
+
+Every vector $v \\in V$ can be uniquely expressed as:
+
+$$
+v = \\sum_{i=1}^n \\alpha_i b_i
+$$
+
+<hr>
+
+<h3>3. Dimension</h3>
+
+The dimension of $V$ is the number of vectors in any basis:
+
+$$
+\\dim(V) = n
+$$
+
+<hr>
+
+<h3>4. Theorem</h3>
+
+<p>
+All bases of a finite-dimensional vector space have the same number of elements.
+</p>
+
+<hr>
+
+<h3>5. Change of Basis</h3>
+
+Given two bases $B$ and $C$, there exists an invertible matrix $P$ such that:
+
+$$
+[v]_C = P [v]_B
+$$
+
+<hr>
+
+<h3>6. ML Interpretation</h3>
+
+<ul>
+<li>Features form a coordinate system.</li>
+<li>PCA finds a new orthogonal basis.</li>
+<li>Dimensionality reduction finds a lower-dimensional basis.</li>
+</ul>
+
+`
+},
+    ]},
+    { title:'Linear Transformations', items:[
+      {
+  h:'Linear Transformations',
+  p:`
+
+<h3>1. Definition</h3>
+
+<p>
+A function $T : V \\to W$ between vector spaces is a <b>linear transformation</b> if:
+</p>
+
+$$
+T(u+v) = T(u) + T(v)
+$$
+
+$$
+T(\\alpha v) = \\alpha T(v)
+$$
+
+<p>
+These two properties imply:
+</p>
+
+$$
+T(0) = 0
+$$
+
+<hr>
+
+<h3>2. Matrix Representation</h3>
+
+If $T : \\mathbb{R}^n \\to \\mathbb{R}^m$, then there exists a matrix $A$ such that:
+
+$$
+T(x) = Ax
+$$
+
+<p>
+Each column of $A$ is the image of a basis vector:
+</p>
+
+$$
+A = [T(e_1) \\, T(e_2) \\, ... \\, T(e_n)]
+$$
+
+<hr>
+
+<h3>3. Geometric Interpretation</h3>
+
+Linear transformations preserve:
+
+<ul>
+<li>Origin</li>
+<li>Linearity (straight lines remain straight)</li>
+<li>Parallelism</li>
+</ul>
+
+Examples:
+
+<ul>
+<li>Scaling</li>
+<li>Rotation</li>
+<li>Reflection</li>
+<li>Shearing</li>
+<li>Projection</li>
+</ul>
+
+`
+},
+      {
+  h:'Kernel & Image',
+  p:`
+
+<h3>1. Kernel (Null Space)</h3>
+
+<p>
+The kernel of $T$ is:
+</p>
+
+$$
+\\text{Ker}(T) = \\{ v \\in V : T(v) = 0 \\}
+$$
+
+<p>
+It measures the set of vectors collapsed to zero.
+</p>
+
+<hr>
+
+<h3>2. Image (Range)</h3>
+
+$$
+\\text{Im}(T) = \\{ T(v) : v \\in V \\}
+$$
+
+<p>
+The image is the set of outputs.
+</p>
+
+<hr>
+
+<h3>3. Dimension Interpretation</h3>
+
+<ul>
+<li>$\\dim(\\text{Ker}(T))$ = Nullity</li>
+<li>$\\dim(\\text{Im}(T))$ = Rank</li>
+</ul>
+
+<hr>
+
+<h3>4. Injective & Surjective</h3>
+
+<ul>
+<li>Injective ⇔ Kernel = {0}</li>
+<li>Surjective ⇔ Image = entire codomain</li>
+<li>Bijective ⇔ Invertible</li>
+</ul>
+
+<hr>
+
+<h3>5. Geometric Meaning</h3>
+
+<p>
+Kernel = directions lost.<br>
+Image = directions preserved.
+</p>
+
+`
+},
+{
+  h:'Rank–Nullity Theorem',
+  p:`
+
+<h3>1. Statement</h3>
+
+For a linear transformation $T : V \\to W$:
+
+$$
+\\dim(V) = \\text{rank}(T) + \\text{nullity}(T)
+$$
+
+<hr>
+
+<h3>2. Matrix Form</h3>
+
+For $A \\in \\mathbb{R}^{m \\times n}$:
+
+$$
+n = \\text{rank}(A) + \\text{nullity}(A)
+$$
+
+<hr>
+
+<h3>3. Interpretation</h3>
+
+<p>
+Dimension of input space splits into:
+</p>
+
+<ul>
+<li>Dimensions preserved (rank)</li>
+<li>Dimensions collapsed (nullity)</li>
+</ul>
+
+<hr>
+
+<h3>4. Example</h3>
+
+If:
+
+$$
+A : \\mathbb{R}^3 \\to \\mathbb{R}^2
+$$
+
+and rank = 2, then:
+
+$$
+\\text{nullity} = 1
+$$
+
+Meaning one direction is lost.
+
+<hr>
+
+<h3>5. ML Insight</h3>
+
+<ul>
+<li>Rank deficiency causes multicollinearity.</li>
+<li>Null space relates to underdetermined systems.</li>
+<li>Full rank ⇒ invertibility ⇒ stable models.</li>
+</ul>
+
+`
+},
+    ]},
+    {title:'Orthogonality & Projections', items:[
+      {
+  h:'Orthogonality',
+  p:`
+
+<h3>1. Definition</h3>
+
+Vectors $u, v \\in V$ are orthogonal if:
+
+$$
+\\langle u, v \\rangle = 0
+$$
+
+<hr>
+
+<h3>2. Orthogonal Sets</h3>
+
+A set $\\{v_1,...,v_k\\}$ is orthogonal if:
+
+$$
+\\langle v_i, v_j \\rangle = 0 \\quad \\text{for } i \\ne j
+$$
+
+If additionally:
+
+$$
+||v_i|| = 1
+$$
+
+then the set is <b>orthonormal</b>.
+
+<hr>
+
+<h3>3. Key Property</h3>
+
+For orthogonal vectors:
+
+$$
+||v_1 + v_2||^2 = ||v_1||^2 + ||v_2||^2
+$$
+
+(Pythagorean theorem)
+
+<hr>
+
+<h3>4. Orthogonal Complement</h3>
+
+For subspace $W$:
+
+$$
+W^{\\perp} = \\{ v \\mid \\langle v,w \\rangle = 0 \\; \\forall w \\in W \\}
+$$
+
+<hr>
+
+<h3>Geometric Meaning</h3>
+
+Orthogonality represents independence of directions in space.
+
+`
+},
+{
+  h:'Gram–Schmidt Process',
+  p:`
+
+<h3>1. Goal</h3>
+
+Convert a linearly independent set into an orthonormal basis.
+
+<hr>
+
+<h3>2. Construction</h3>
+
+Given independent vectors $v_1,...,v_k$:
+
+Step 1:
+
+$$
+u_1 = v_1
+$$
+
+Step 2:
+
+$$
+u_2 = v_2 - \\text{proj}_{u_1}(v_2)
+$$
+
+General step:
+
+$$
+u_k = v_k - \\sum_{j=1}^{k-1} \\text{proj}_{u_j}(v_k)
+$$
+
+where
+
+$$
+\\text{proj}_{u}(v) = \\frac{\\langle v,u \\rangle}{\\langle u,u \\rangle} u
+$$
+
+Normalize:
+
+$$
+e_i = \\frac{u_i}{||u_i||}
+$$
+
+<hr>
+
+<h3>3. Result</h3>
+
+Produces orthonormal basis $\\{e_1,...,e_k\\}$.
+
+<hr>
+
+<h3>4. Importance</h3>
+
+Foundation of QR decomposition and numerical linear algebra.
+
+`
+},
+{
+  h:'QR Decomposition',
+  p:`
+
+<h3>1. Definition</h3>
+
+For matrix $A \\in \\mathbb{R}^{m \\times n}$:
+
+$$
+A = QR
+$$
+
+where:
+
+<ul>
+<li>$Q$ has orthonormal columns</li>
+<li>$R$ is upper triangular</li>
+</ul>
+
+<hr>
+
+<h3>2. Construction</h3>
+
+Apply Gram–Schmidt to columns of $A$.
+
+<hr>
+
+<h3>3. Properties</h3>
+
+$$
+Q^T Q = I
+$$
+
+$$
+R = Q^T A
+$$
+
+<hr>
+
+<h3>4. Importance</h3>
+
+<ul>
+<li>Numerically stable solving of systems</li>
+<li>Least squares problems</li>
+<li>Eigenvalue algorithms</li>
+</ul>
+
+`
+},
+{
+  h:'Least Squares',
+  p:`
+
+<h3>1. Problem</h3>
+
+Solve:
+
+$$
+Ax = b
+$$
+
+when no exact solution exists.
+
+<hr>
+
+<h3>2. Idea</h3>
+
+Find $\\hat{x}$ minimizing:
+
+$$
+||Ax - b||^2
+$$
+
+<hr>
+
+<h3>3. Normal Equations</h3>
+
+$$
+A^T A \\hat{x} = A^T b
+$$
+
+<hr>
+
+<h3>4. Projection Interpretation</h3>
+
+$Ax$ is projection of $b$ onto column space of $A$.
+
+$$
+b = \\hat{b} + r
+$$
+
+where:
+
+<ul>
+<li>$\\hat{b} \\in \\text{Col}(A)$</li>
+<li>$r \\in \\text{Col}(A)^{\\perp}$</li>
+</ul>
+
+<hr>
+
+<h3>5. Projection Matrix</h3>
+
+$$
+P = A (A^T A)^{-1} A^T
+$$
+
+Then:
+
+$$
+\\hat{b} = Pb
+$$
+
+<hr>
+
+<h3>6. ML Connection</h3>
+
+Least squares = Linear regression solution.
+
+`,
+}
+      ]},
+      {title:'Spectral Theory', items:[
+        {
+  h:'Eigenvalues & Eigenvectors',
+  p:`
+
+<h3>1. Definition</h3>
+
+For matrix $A \\in \\mathbb{R}^{n \\times n}$,
+a non-zero vector $v$ is an eigenvector if:
+
+$$
+Av = \\lambda v
+$$
+
+where $\\lambda$ is the eigenvalue.
+
+<hr>
+
+<h3>2. Characteristic Equation</h3>
+
+$$
+\\det(A - \\lambda I) = 0
+$$
+
+Solutions give eigenvalues.
+
+<hr>
+
+<h3>3. Geometric Meaning</h3>
+
+Eigenvectors are directions that remain unchanged
+under transformation (only scaled).
+
+Eigenvalues measure scaling factor.
+
+<ul>
+<li>$|\\lambda| > 1$ → expansion</li>
+<li>$|\\lambda| < 1$ → contraction</li>
+<li>$\\lambda < 0$ → direction flip</li>
+</ul>
+
+<hr>
+
+<h3>4. Algebraic vs Geometric Multiplicity</h3>
+
+<ul>
+<li>Algebraic multiplicity = multiplicity in characteristic polynomial</li>
+<li>Geometric multiplicity = dimension of eigenspace</li>
+</ul>
+
+Always:
+
+$$
+1 \\le \\text{geom mult} \\le \\text{alg mult}
+$$
+
+`,
+},
+{
+  h:'Diagonalisation',
+  p:`
+
+<h3>1. Definition</h3>
+
+Matrix $A$ is diagonalizable if:
+
+$$
+A = PDP^{-1}
+$$
+
+where:
+
+<ul>
+<li>$D$ is diagonal (eigenvalues)</li>
+<li>$P$ columns are eigenvectors</li>
+</ul>
+
+<hr>
+
+<h3>2. Condition</h3>
+
+$A$ is diagonalizable iff it has $n$ linearly independent eigenvectors.
+
+<hr>
+
+<h3>3. Why Important</h3>
+
+Then:
+
+$$
+A^k = P D^k P^{-1}
+$$
+
+This simplifies powers and dynamics.
+
+<hr>
+
+<h3>4. Interpretation</h3>
+
+Diagonalisation means changing coordinate system
+to eigenbasis where transformation becomes pure scaling.
+
+`,
+},
+      ]},
+      { title:'Matrix Decomposition', items:[
+        {
+  h:'LU Decomposition',
+  p:`
+
+<h3>1. Definition</h3>
+
+For square matrix $A \\in \\mathbb{R}^{n \\times n}$:
+
+$$
+A = LU
+$$
+
+where:
+
+<ul>
+<li>$L$ = lower triangular matrix</li>
+<li>$U$ = upper triangular matrix</li>
+</ul>
+
+<hr>
+
+<h3>2. Interpretation</h3>
+
+LU corresponds to Gaussian elimination.
+
+Solving:
+
+$$
+Ax = b
+$$
+
+becomes:
+
+$$
+LUx = b
+$$
+
+Step 1: Solve $Ly = b$  
+Step 2: Solve $Ux = y$
+
+<hr>
+
+<h3>3. Existence</h3>
+
+LU exists (without pivoting) if leading principal minors are non-zero.
+
+With pivoting:
+
+$$
+PA = LU
+$$
+
+where $P$ is permutation matrix.
+
+<hr>
+
+<h3>4. Importance</h3>
+
+<ul>
+<li>Efficient linear system solving</li>
+<li>Computationally cheaper than matrix inverse</li>
+<li>Used in numerical libraries</li>
+</ul>
+
+`
+},
+{
+  h:'QR Decomposition',
+  p:`
+
+<h3>1. Definition</h3>
+
+For $A \\in \\mathbb{R}^{m \\times n}$:
+
+$$
+A = QR
+$$
+
+where:
+
+<ul>
+<li>$Q$ has orthonormal columns</li>
+<li>$R$ is upper triangular</li>
+</ul>
+
+<hr>
+
+<h3>2. Orthogonality Property</h3>
+
+$$
+Q^T Q = I
+$$
+
+Thus:
+
+$$
+R = Q^T A
+$$
+
+<hr>
+
+<h3>3. Least Squares</h3>
+
+Instead of solving:
+
+$$
+A^T A x = A^T b
+$$
+
+we use:
+
+$$
+Rx = Q^T b
+$$
+
+More numerically stable.
+
+<hr>
+
+<h3>4. Importance</h3>
+
+<ul>
+<li>Used in regression</li>
+<li>Used in eigenvalue algorithms</li>
+<li>Numerically stable alternative to normal equations</li>
+</ul>
+
+`
+},
+{
+  h:'Singular Value Decomposition (SVD)',
+  p:`
+
+<h3>1. Theorem</h3>
+
+For any matrix $A \\in \\mathbb{R}^{m \\times n}$:
+
+$$
+A = U \\Sigma V^T
+$$
+
+where:
+
+<ul>
+<li>$U$ orthogonal ($m \\times m$)</li>
+<li>$V$ orthogonal ($n \\times n$)</li>
+<li>$\\Sigma$ diagonal with non-negative singular values</li>
+</ul>
+
+<hr>
+
+<h3>2. Singular Values</h3>
+
+Singular values are:
+
+$$
+\\sigma_i = \\sqrt{\\lambda_i(A^T A)}
+$$
+
+They are square roots of eigenvalues of $A^T A$.
+
+<hr>
+
+<h3>3. Geometric Interpretation</h3>
+
+SVD decomposes transformation into:
+
+1. Rotation (Vᵀ)  
+2. Scaling (Σ)  
+3. Rotation (U)
+
+It reveals principal directions of transformation.
+
+<hr>
+
+<h3>4. Rank & Low-Rank Approximation</h3>
+
+If:
+
+$$
+\\sigma_1 \\ge \\sigma_2 \\ge ... \\ge \\sigma_r
+$$
+
+Best rank-k approximation:
+
+$$
+A_k = U_k \\Sigma_k V_k^T
+$$
+
+(Eckart–Young theorem)
+
+<hr>
+
+<h3>5. ML Applications</h3>
+
+<ul>
+<li>PCA</li>
+<li>Dimensionality reduction</li>
+<li>Recommender systems</li>
+<li>Latent semantic analysis</li>
+<li>Noise filtering</li>
+</ul>
+
+<hr>
+
+<h3>6. Pseudoinverse</h3>
+
+$$
+A^+ = V \\Sigma^+ U^T
+$$
+
+Used for least squares solutions.
+
+`,
+}
+      ]},
+      { title:'Matrix Calculus', items:[
+      {
+  h:'Gradients & Jacobians',
+  p:`
+
+<h3>1. Scalar Function of a Vector</h3>
+
+Let:
+
+$$
+f : \\mathbb{R}^n \\to \\mathbb{R}
+$$
+
+The gradient is:
+
+$$
+\\nabla f(x) =
+\\begin{bmatrix}
+\\frac{\\partial f}{\\partial x_1} \\\\
+\\vdots \\\\
+\\frac{\\partial f}{\\partial x_n}
+\\end{bmatrix}
+$$
+
+It is a vector pointing in direction of steepest ascent.
+
+<hr>
+
+<h3>2. Directional Derivative</h3>
+
+For unit vector $u$:
+
+$$
+D_u f(x) = \\nabla f(x)^T u
+$$
+
+Maximum increase occurs when $u$ aligns with $\\nabla f$.
+
+<hr>
+
+<h3>3. Jacobian Matrix</h3>
+
+For:
+
+$$
+F : \\mathbb{R}^n \\to \\mathbb{R}^m
+$$
+
+$$
+J =
+\\begin{bmatrix}
+\\frac{\\partial f_1}{\\partial x_1} & ... & \\frac{\\partial f_1}{\\partial x_n} \\\\
+\\vdots & & \\vdots \\\\
+\\frac{\\partial f_m}{\\partial x_1} & ... & \\frac{\\partial f_m}{\\partial x_n}
+\\end{bmatrix}
+$$
+
+Jacobian generalizes derivative to multivariate vector functions.
+
+<hr>
+
+<h3>4. Chain Rule (Matrix Form)</h3>
+
+If:
+
+$$
+z = f(y), \quad y = g(x)
+$$
+
+Then:
+
+$$
+\\frac{dz}{dx} = \\frac{dz}{dy} \\frac{dy}{dx}
+$$
+
+This is the backbone of backpropagation.
+
+`,
+},
+{
+  h:'Hessians & Curvature',
+  p:`
+
+<h3>1. Definition</h3>
+
+For scalar function $f$:
+
+$$
+H =
+\\nabla^2 f(x) =
+\\begin{bmatrix}
+\\frac{\\partial^2 f}{\\partial x_1^2} & ... \\\\
+\\vdots & \\ddots
+\\end{bmatrix}
+$$
+
+It is the matrix of second derivatives.
+
+<hr>
+
+<h3>2. Symmetry</h3>
+
+If $f$ is twice differentiable:
+
+$$
+H = H^T
+$$
+
+(Schwarz theorem)
+
+<hr>
+
+<h3>3. Quadratic Approximation</h3>
+
+Taylor expansion:
+
+$$
+f(x + h) \\approx f(x)
++ \\nabla f(x)^T h
++ \\frac{1}{2} h^T H h
+$$
+
+This explains curvature.
+
+<hr>
+
+<h3>4. Positive Definiteness</h3>
+
+<ul>
+<li>$H \\succ 0$ → Local minimum</li>
+<li>$H \\prec 0$ → Local maximum</li>
+<li>Indefinite → Saddle point</li>
+</ul>
+
+Eigenvalues of Hessian determine shape.
+
+`,
+},
+{
+  h:'Optimization Link',
+  p:`
+
+<h3>1. Gradient Descent</h3>
+
+Update rule:
+
+$$
+x_{k+1} = x_k - \\eta \\nabla f(x_k)
+$$
+
+where $\\eta$ = learning rate.
+
+<hr>
+
+<h3>2. Why It Works</h3>
+
+Because:
+
+$$
+-\\nabla f(x)
+$$
+
+is direction of steepest descent.
+
+<hr>
+
+<h3>3. Quadratic Case</h3>
+
+If:
+
+$$
+f(x) = \\frac{1}{2} x^T A x - b^T x
+$$
+
+Then:
+
+$$
+\\nabla f(x) = Ax - b
+$$
+
+Minimum occurs when:
+
+$$
+Ax = b
+$$
+
+Thus solving linear systems = minimizing quadratic.
+
+<hr>
+
+<h3>4. Condition Number</h3>
+
+Convergence speed depends on:
+
+$$
+\\kappa(A) = \\frac{\\lambda_{max}}{\\lambda_{min}}
+$$
+
+Large condition number → slow convergence.
+
+<hr>
+
+<h3>5. ML Interpretation</h3>
+
+<ul>
+<li>Linear regression = quadratic optimization</li>
+<li>Neural networks = non-linear high-dimensional optimization</li>
+<li>Hessian spectrum affects training stability</li>
+</ul>
+
+`,
+}
+    ]}
+    
+    
+  ]},
+  mltechniques: { label:'01c — ML Techniques', title:'Machine Learning Techniques', sections:[
+    { title:'Supervised Learning', items:[
+      { h:'Classification Algorithms', p:'Decision Trees, Random Forests, SVM, k-NN — how they work and when to use them. [Placeholder: add your notes here]' },
+      { h:'Regression Algorithms', p:'Linear, Ridge, Lasso, Polynomial regression and regularisation. [Placeholder: add your notes here]' }
+    ]},
+    { title:'Unsupervised Learning', items:[
+      { h:'Clustering', p:'K-Means, DBSCAN, Hierarchical clustering — algorithms and evaluation metrics. [Placeholder: add your notes here]' },
+      { h:'Dimensionality Reduction', p:'PCA, t-SNE, UMAP — reducing dimensions while preserving structure. [Placeholder: add your notes here]' }
+    ]}
+  ]},
+  mlfoundations: { label:'01d — ML Foundations', title:'Machine Learning Foundations', sections:[
+    { title:'Core Theory', items:[
+      { h:'Loss Functions', p:'MSE, MAE, Cross-Entropy — what they measure and how they guide learning. [Placeholder: add your notes here]' },
+      { h:'Gradient Descent', p:'Batch, stochastic, and mini-batch gradient descent. Learning rate intuition. [Placeholder: add your notes here]' }
+    ]},
+    { title:'Model Behaviour', items:[
+      { h:'Bias-Variance Tradeoff', p:'Understanding underfitting vs overfitting and how to diagnose them. [Placeholder: add your notes here]' },
+      { h:'Regularisation', p:'L1 and L2 penalties — preventing overfitting and improving generalisation. [Placeholder: add your notes here]' }
+    ]}
+  ]},
+  mlpractice: { label:'01e — ML Practice', title:'Machine Learning Practice', sections:[
+    { title:'Data Preparation', items:[
+      { h:'Feature Engineering', p:'Creating meaningful features, encoding categoricals, handling missing data. [Placeholder: add your notes here]' },
+      { h:'Data Pipelines', p:'Building reproducible preprocessing pipelines using sklearn. [Placeholder: add your notes here]' }
+    ]},
+    { title:'Evaluation & Deployment', items:[
+      { h:'Model Evaluation', p:'Train/test splits, cross-validation, metrics — accuracy, F1, AUC-ROC. [Placeholder: add your notes here]' },
+      { h:'Hyperparameter Tuning', p:'Grid search, random search, Bayesian optimisation. [Placeholder: add your notes here]' }
+    ]}
+  ]}
+};
+
+// ── PROJECT DATA ─────────────────────────────────────────────
+const projectData = {
+  python: [
+    { name:'Exploratory Data Analysis on Sales Dataset', overview:'Comprehensive EDA on a retail sales dataset of 100K+ transactions using Pandas, Matplotlib, and Seaborn.', desc:'Conducted end-to-end exploratory analysis on 1M+ retail transactions to identify seasonal demand patterns, revenue concentration, customer lifetime value segments (RFM), retention trends, and return-driven revenue impact using Python (pandas, seaborn, matplotlib).', findings:'The analysis of over 1 million retail transactions revealed strong seasonal demand, with Q4 consistently generating the highest revenue and November emerging as the peak sales month. Revenue is highly concentrated, with the top 33% of customers contributing approximately 87% of total revenue. RFM segmentation further showed that Champions alone account for around 51% of revenue, while Champions and Loyal Customers together drive over 70% of total sales. Cohort analysis highlighted a sharp decline in retention after the first purchase, with long-term retention stabilizing at approximately 5–10%. Although returns represent only about 2.15% of total transactions, they impact nearly 7.28% of total revenue, indicating disproportionate exposure from higher-value returned orders.', github:  'https://github.com/AparajitoPaul/retail-sales-analytics-case-study', image:'images/projects/retail_eda.png' },
+    { name:'Customer Churn Prediction Model', overview:'Built a time-aware churn prediction model on 1M+ retail transactions, engineering behavioral features and optimizing retention strategy using revenue-weighted risk scoring.', desc:'Conducted end-to-end time-based churn modeling on 1M+ retail transactions, engineering advanced behavioral features (RFM, purchase volatility, revenue trend) and building leakage-free classification models to identify high-risk customers, optimize revenue-at-risk targeting, and simulate retention ROI improvements of 7.6x using Python (pandas, scikit-learn, SHAP, matplotlib).', findings:'Achieved ~0.79 ROC-AUC with 90% Precision@Top15% using leakage-free time-based validation. Recency and purchase volatility emerged as key churn drivers. Revenue-weighted targeting improved retention ROI to 7.6x by capturing 41% of revenue-at-risk.', github:'https://github.com/AparajitoPaul/retail-churn-prediction-ml', image:'images/projects/churn.png' },
+    { name:'Sentiment Analysis — Product Reviews', overview:'NLP pipeline classifying Amazon reviews using TF-IDF baseline vs fine-tuned BERT model.', desc:'Compared classical NLP (TF-IDF + LogReg) vs fine-tuned BERT for binary sentiment classification on 50,000 Amazon product reviews. Included data cleaning, class balancing, and model interpretability steps.', findings:'BERT outperformed baseline by 12% in F1 score. Negation handling was the key challenge. 1-star reviews clustered around shipping and packaging — not product quality.', github:'#', image:null, emoji:'💬' },
+  ],
+  sql: [
+    { name:'Retail Database Analysis', overview:'Multi-table SQL analysis of customer lifetime value, product margins, and store performance across 10+ joined tables.', desc:'Worked with a normalised retail database across 10+ tables. Used CTEs, window functions, and subqueries to build analytical views for store managers and the commercial team.', findings:'Identified top-performing stores and underperforming SKUs. Rolling 30-day averages revealed inventory issues in the North region. CTE usage improved query readability significantly.', github:'#', image:null, emoji:'🏪' },
+    { name:'Employee Performance Queries', overview:'HR analytics in SQL covering attrition rates, department performance gaps, and salary benchmarking.', desc:'Queried a 5,000-employee HR dataset to surface attrition patterns, performance gaps, and compensation outliers. Built views to power a downstream Power BI dashboard.', findings:'Team tenure strongly correlates with lower attrition. Departments with 1:1 manager-to-IC ratios had 20% higher performance scores. Salary outliers concentrated in mid-career technical roles.', github:'#', image:null, emoji:'👥' },
+    { name:'E-Commerce Funnel Analysis', overview:'Full purchase funnel analysis from page view to checkout — identifying conversion rates and drop-off points.', desc:'Used event-level clickstream data to reconstruct the 6-step purchase funnel. Applied session attribution and cohort analysis to segment users by traffic source and device type.', findings:'Cart abandonment at 68%. Mobile users drop off 2× more at checkout. UX bottleneck traced to the address form — fixing it projects a 9% conversion lift.', github:'#', image:null, emoji:'🛒' },
+  ],
+  powerbi: [
+    { name:'Sales Performance Dashboard', overview:'Interactive executive dashboard tracking monthly revenue, regional breakdown, and top product performance with drill-through.', desc:'Built an executive-facing Power BI dashboard consolidating sales data from 3 regions. Features dynamic filtering by date range, product category, and territory — with KPI cards, trend lines, and drill-through pages.', findings:'Dashboard revealed the Western region underperforming targets by 18% YTD. Top 3 products account for 55% of revenue. Month-over-month trend lines exposed a post-Q1 dip worth investigating.', screenshots:[null,null,null], captions:['Overview — KPI Cards & Revenue Trend','Regional Breakdown — Map & Bar Chart','Product Drill-Through — SKU Performance'], emoji:'📊' },
+    { name:'HR Analytics Dashboard', overview:'Workforce health dashboard covering headcount, attrition waterfall charts, and department performance scores.', desc:'Designed for the HR team to monitor workforce health weekly. Combines headcount tables, attrition rate waterfall charts, and satisfaction gauges. Refreshes automatically via SharePoint connector.', findings:'Attrition spiked 23% in Q3 in Engineering. Highest turnover in the 1–2 year tenure band. Performance scores inversely correlated with team size above 12 members.', screenshots:[null,null], captions:['Attrition Waterfall & Headcount Trend','Department Performance Score Heatmap'], emoji:'👥' },
+    { name:'Financial KPI Report', overview:'Monthly P&L interactive report replacing a legacy Excel file — budget vs actual variance analysis with live SQL Server data.', desc:'Replaced a legacy Excel report with an interactive Power BI report pulling live data from SQL Server. Features conditional formatting, budget-vs-actual variance bars, and YTD rolling calculations.', findings:'Cost overruns identified in 3 departments masked in the old Excel report. Revenue variance consistently positive in H2 but negative in Q1 — seasonal pattern now visible and trackable.', screenshots:[null,null], captions:['P&L Summary — Budget vs Actual','YTD Rolling Revenue & Cost Variance'], emoji:'💰' },
+  ],
+  r: [
+    { name:'Statistical Modelling in R', overview:'Multiple and logistic regression with full diagnostics — residual plots, VIF checks, and stepwise model selection.', desc:'Built regression models on a housing dataset. Includes residual plots, Q-Q plots, Cook\'s distance, and model selection using AIC/BIC stepwise procedures.', findings:'4 significant predictors identified via stepwise selection. VIF analysis resolved multicollinearity. Final model achieved R² of 0.82 on the holdout set.', github:'#', image:null, emoji:'📐' },
+    { name:'Data Visualisation with ggplot2', overview:'Publication-quality charts exploring income inequality, health outcomes, and education using custom ggplot2 themes.', desc:'A portfolio of ggplot2 charts exploring income inequality, health outcomes, and education attainment across US states. A custom dark theme was created for visual consistency.', findings:'Clear income inequality trends across age and education groups. Faceted plots revealed geographic clustering in health outcomes. Custom theme adopted across all portfolio R projects.', github:'#', image:null, emoji:'🎨' },
+    { name:'Time Series Forecasting', overview:'ARIMA vs Prophet models on 3 years of monthly sales data — seasonal decomposition and forecast interval visualisation.', desc:'Applied ARIMA and Facebook Prophet to 3 years of monthly sales data. Includes STL decomposition, ACF/PACF analysis, and forecast interval visualisation.', findings:'Prophet outperformed ARIMA on MAPE by 8%. Strong yearly seasonality detected — December spike, February dip. Forecasts informed Q1 inventory planning decisions.', github:'#', image:null, emoji:'📈' },
+  ]
+};
+
+// ── RENDER FUNCTIONS ─────────────────────────────────────────
+const githubSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>`;
+
+function cardImgHTML(image, emoji) {
+  if (image) return `<div class="proj-card-img" style="background:#000"><img src="${image}" alt=""/></div>`;
+  return `<div class="proj-card-img"><div class="proj-img-placeholder"><div class="img-icon">${emoji}</div><div class="img-label">Add Screenshot</div></div></div>`;
+}
+
+function renderCards(lang) {
+  const container = document.getElementById('cards-' + lang);
+  if (!container) return;
+  container.innerHTML = projectData[lang].map((p, i) => `
+    <div class="proj-card" onclick="showDetail('${lang}',${i})">
+      ${cardImgHTML(p.image, p.emoji)}
+      <div class="proj-card-body">
+        <div class="proj-card-lang">${lang.toUpperCase()}</div>
+        <div class="proj-card-title">${p.name}</div>
+        <div class="proj-card-overview">${p.overview}</div>
+        <div class="proj-card-cta">View Project →</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderPBICards() {
+  const container = document.getElementById('cards-powerbi');
+  if (!container) return;
+  container.innerHTML = projectData.powerbi.map((p, i) => `
+    <div class="proj-card" onclick="showPBIDetail(${i})">
+      ${cardImgHTML(p.screenshots[0], p.emoji)}
+      <div class="proj-card-body">
+        <div class="proj-card-lang">POWER BI</div>
+        <div class="proj-card-title">${p.name}</div>
+        <div class="proj-card-overview">${p.overview}</div>
+        <div class="proj-card-cta">View Dashboard →</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── DETAIL PAGES ─────────────────────────────────────────────
+function showDetail(lang, idx) {
+  const p = projectData[lang][idx];
+  const cardsEl = document.getElementById('cards-' + lang);
+  const detailEl = document.getElementById('detail-' + lang);
+
+  const heroContent = p.image
+    ? `<img src="${p.image}" alt="${p.name}"/>`
+    : `<div class="detail-hero-placeholder"><div class="big-icon">${p.emoji}</div><p>Add your project screenshot here</p></div>`;
+
+  detailEl.innerHTML = `
+    <button class="back-btn" onclick="backToCards('${lang}')">← Back to ${lang.toUpperCase()} projects</button>
+    <div class="detail-hero-img-wrap">${heroContent}</div>
+    <span style="font-size:0.63rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">${lang.toUpperCase()} project</span>
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-0.02em;margin:0.75rem 0 2rem;">${p.name}</h2>
+    <div class="proj-detail-grid">
+      <div><div class="detail-block"><div class="detail-block-label">Overview</div><div class="detail-block-text">${p.desc}</div></div></div>
+      <div>
+        <div class="detail-block"><div class="detail-block-label">Key Findings</div><div class="detail-block-text">${p.findings}</div></div>
+        <div style="margin-top:1.5rem;"><a href="${p.github}" target="_blank" class="github-btn">${githubSVG} View on GitHub</a></div>
+      </div>
+    </div>`;
+
+  cardsEl.style.display = 'none';
+  detailEl.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showPBIDetail(idx) {
+  const p = projectData.powerbi[idx];
+  const cardsEl = document.getElementById('cards-powerbi');
+  const detailEl = document.getElementById('detail-powerbi');
+
+  const galleryHTML = p.screenshots.map((src, i) => {
+    const thumb = src
+      ? `<img src="${src}" alt="${p.captions[i]}" onclick="openLightbox('${src}')"/>`
+      : `<div class="gallery-thumb-placeholder"><div class="g-icon">🖼️</div><div class="g-label">Screenshot ${i + 1}</div></div>`;
+    return `<div class="gallery-thumb">${thumb}<div class="gallery-caption">${p.captions[i]}</div></div>`;
+  }).join('');
+
+  detailEl.innerHTML = `
+    <button class="back-btn" onclick="backToCards('powerbi')">← Back to Power BI dashboards</button>
+    <span style="font-size:0.63rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">POWER BI dashboard</span>
+    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-0.02em;margin:0.75rem 0 0.5rem;">${p.name}</h2>
+    <p style="font-size:0.7rem;color:var(--muted);margin-bottom:1.5rem;">Click any screenshot to enlarge ↗</p>
+    <div class="img-gallery">${galleryHTML}</div>
+    <div class="proj-detail-grid">
+      <div><div class="detail-block"><div class="detail-block-label">About This Dashboard</div><div class="detail-block-text">${p.desc}</div></div></div>
+      <div><div class="detail-block"><div class="detail-block-label">Key Findings</div><div class="detail-block-text">${p.findings}</div></div></div>
+    </div>`;
+
+  cardsEl.style.display = 'none';
+  detailEl.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function backToCards(lang) {
+  const cardsEl = document.getElementById('cards-' + lang);
+  const detailEl = document.getElementById('detail-' + lang);
+  detailEl.classList.remove('active');
+  detailEl.innerHTML = '';
+  cardsEl.style.display = 'grid';
+  window.scrollTo(0, 0);
+}
+
+// ── ROUTING ───────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const links = document.querySelectorAll('.nav-link');
+  links.forEach(l => l.classList.remove('active'));
+  const map = { journey:0, projects:1, certifications:2, about:3 };
+  // Update both desktop and mobile nav links
+  if (map[id] !== undefined) {
+    document.querySelectorAll('.nav-links .nav-link')[map[id]].classList.add('active');
+    document.querySelectorAll('.nav-drawer .nav-link')[map[id]].classList.add('active');
+  }
+  window.scrollTo(0, 0);
+}
+
+// ── HAMBURGER ─────────────────────────────────────────────────
+function toggleDrawer() {
+  const drawer = document.getElementById('nav-drawer');
+  const burger = document.getElementById('hamburger');
+  drawer.classList.toggle('open');
+  burger.classList.toggle('open');
+}
+function closeDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// ── MOBILE NOTES TOGGLE ───────────────────────────────────────
+function toggleMobileTopics() {
+  const btn = document.getElementById('notes-mobile-btn');
+  const drawer = document.getElementById('notes-mobile-drawer');
+  btn.classList.toggle('open');
+  drawer.classList.toggle('open');
+}
+
+function showNotes(key) {
+  const d = notesData[key];
+  document.getElementById('notes-label').textContent = d.label;
+  document.getElementById('notes-title').textContent = d.title;
+  document.getElementById('notes-sub').textContent = d.sub || '';
+
+  // Build flat list of all topics with section info
+  const allTopics = [];
+  d.sections.forEach(sec => {
+    sec.items.forEach(item => {
+      allTopics.push({ section: sec.title, h: item.h, p: item.p });
+    });
+  });
+
+  // Build sidebar HTML (desktop)
+  let sidebarHTML = `<div class="notes-sidebar-subject"><span>${d.label.split('—')[0].trim()}</span>${d.title}</div>`;
+  // Build mobile drawer HTML
+  let mobileHTML = '';
+
+  d.sections.forEach((sec, si) => {
+    sidebarHTML += `<div class="notes-sidebar-section-label">${sec.title}</div>`;
+    mobileHTML += `<div class="notes-sidebar-section-label">${sec.title}</div>`;
+    sec.items.forEach((item) => {
+      const globalIdx = allTopics.findIndex(t => t.h === item.h && t.section === sec.title);
+      sidebarHTML += `<button class="notes-sidebar-item" id="sbi-${key}-${globalIdx}" onclick="showTopic('${key}',${globalIdx})">
+        <span class="sbi-dot"></span>${item.h}
+      </button>`;
+      mobileHTML += `<button class="notes-sidebar-item" id="msbi-${key}-${globalIdx}" onclick="showTopic('${key}',${globalIdx},true)">
+        <span class="sbi-dot"></span>${item.h}
+      </button>`;
+    });
+    if (si < d.sections.length - 1) {
+      sidebarHTML += `<div class="notes-sidebar-section-divider"></div>`;
+      mobileHTML += `<div class="notes-sidebar-section-divider"></div>`;
+    }
+  });
+
+  document.getElementById('notes-sidebar').innerHTML = sidebarHTML;
+  document.getElementById('notes-mobile-drawer').innerHTML = mobileHTML;
+
+  // Reset mobile toggle label
+  document.getElementById('notes-mobile-label').textContent = 'Select a topic';
+  document.getElementById('notes-mobile-btn').classList.remove('open');
+  document.getElementById('notes-mobile-drawer').classList.remove('open');
+
+  // Reset content panel
+  const panel = document.getElementById('notes-content');
+  panel.className = 'notes-content-panel empty';
+  panel.innerHTML = `<div class="empty-icon">📖</div><p>Select a topic from the sidebar</p>`;
+
+  window._notesKey = key;
+  window._notesTopics = allTopics;
+
+  showPage('notes');
+}
+
+function showTopic(key, idx, fromMobile = false) {
+  const topics = window._notesTopics;
+  if (!topics || idx < 0 || idx >= topics.length) return;
+  const topic = topics[idx];
+
+  // Update desktop sidebar active state
+  document.querySelectorAll('.notes-sidebar-item').forEach(el => el.classList.remove('active'));
+  const activeBtn = document.getElementById(`sbi-${key}-${idx}`);
+  if (activeBtn) { activeBtn.classList.add('active'); activeBtn.scrollIntoView({ block: 'nearest' }); }
+  const mActiveBtn = document.getElementById(`msbi-${key}-${idx}`);
+  if (mActiveBtn) mActiveBtn.classList.add('active');
+
+  // Update mobile toggle label and close drawer
+  document.getElementById('notes-mobile-label').textContent = topic.h;
+  document.getElementById('notes-mobile-btn').classList.remove('open');
+  document.getElementById('notes-mobile-drawer').classList.remove('open');
+
+  // Render content
+  const panel = document.getElementById('notes-content');
+  panel.className = 'notes-content-panel';
+
+  // Look up PDF path
+  const pdfPath = (notesPdfs[key] && notesPdfs[key][topic.h]) || null;
+  const downloadIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+  const pdfIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+
+  const hwCard = pdfPath
+    ? `<div class="hw-notes-card">
+        <div class="hw-notes-inner">
+          <div class="hw-notes-left">
+            <div class="hw-notes-icon">✍️</div>
+            <div>
+              <div class="hw-notes-label">Handwritten Notes</div>
+              <div class="hw-notes-title">${topic.h}</div>
+              <div class="hw-notes-meta">PDF · Click to download</div>
+            </div>
+          </div>
+          <a href="${pdfPath}" download class="hw-download-btn">${downloadIcon} Download PDF</a>
+        </div>
+      </div>`
+    : `<div class="hw-notes-card">
+        <div class="hw-notes-inner">
+          <div class="hw-notes-left">
+            <div class="hw-notes-icon">✍️</div>
+            <div>
+              <div class="hw-notes-label">Handwritten Notes</div>
+              <div class="hw-notes-title">${topic.h}</div>
+              <div class="hw-notes-meta" style="color:#333;">PDF not yet uploaded</div>
+            </div>
+          </div>
+          <span class="hw-download-btn no-pdf">${pdfIcon} No PDF yet</span>
+        </div>
+      </div>`;
+
+  panel.innerHTML = `
+    <div class="placeholder-tag">Notes</div>
+    <div class="notes-topic-section">${topic.section}</div>
+    <h2 class="notes-topic-title">${topic.h}</h2>
+    <div class="notes-topic-body">${topic.p}</div>
+    ${hwCard}
+    <div class="notes-nav-footer">
+      <button class="notes-nav-btn" onclick="showTopic('${key}',${idx - 1})" ${idx === 0 ? 'disabled' : ''}>← Previous</button>
+      <span style="font-size:0.65rem;color:#444;letter-spacing:0.08em;">${idx + 1} / ${topics.length}</span>
+      <button class="notes-nav-btn" onclick="showTopic('${key}',${idx + 1})" ${idx === topics.length - 1 ? 'disabled' : ''}>Next →</button>
+    </div>`;
+   
+  if (window.MathJax) {
+  MathJax.typesetPromise();
+  }
+  // On mobile, scroll to content
+  if (fromMobile) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function switchTab(e, tab) {
+  document.querySelectorAll('.proj-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.proj-panel').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  ['python','sql','r','powerbi'].forEach(lang => {
+    const d = document.getElementById('detail-' + lang);
+    const c = document.getElementById('cards-' + lang);
+    if (d) { d.classList.remove('active'); d.innerHTML = ''; }
+    if (c) c.style.display = 'grid';
+  });
+  window.scrollTo(0, 0);
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────────────
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+  event.stopPropagation();
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ── COURSE REPOSITORIES (Journey → GitHub) ─────────────────────
+// Add one entry per course. "name" is what visitors see and click on;
+// "url" is the GitHub repository it takes them to. Add/remove lines
+// as you start or finish courses — the page updates automatically.
+const courseRepos = [
+  { name: 'Deep Learning', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO' },
+  { name: 'Placeholder Course', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO' },
+  { name: 'Placeholder Course', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO' },
+];
+
+function renderRepos() {
+  const grid = document.getElementById('repo-grid');
+  if (!grid) return;
+  grid.innerHTML = courseRepos.map(r => `
+    <a class="repo-card" href="${r.url}" target="_blank" rel="noopener">
+      <div class="repo-card-icon">⌥ GitHub</div>
+      <div class="card-title">${r.name}</div>
+      <div class="card-arrow">View Repository →</div>
+    </a>`).join('');
+}
+
+// ── CERTIFICATIONS ────────────────────────────────────────────
+// Fill in each cert's details below.
+// image: path to your certificate image/pdf, or null if not yet uploaded.
+// link:  URL to the issuer verification page, or null for "No links available".
+const certsData = [
+  { issuer: 'Udemy', name: ' Advanced Excel Formulas & Functions', date: '22 September 2025', image: 'images/certs/excel-certificate.jpg', link: 'https://www.udemy.com/certificate/UC-bec44ed0-8f3f-4b54-bb2b-a76e13056a2a/' },
+  { issuer: 'Udemy', name: 'The Complete SQL Bootcamp', date: '17 May 2026', image: 'images/certs/sql-certificate.jpg', link: 'https://www.udemy.com/certificate/UC-87e98de9-7449-4fff-83d9-26da4d7b4d94/' },
+  { issuer: 'Udemy', name: 'R Programming A-Z™: R For Data Science With Real Exercises!', date: '7 April 2024', image: 'images/certs/r-certificate.jpg', link: 'https://www.udemy.com/certificate/UC-7e3b53d9-cc4b-4f6d-85ea-f9d4822c077c/' },
+  { issuer: 'Placeholder Issuer', name: 'Certification Name Here', date: 'Month Year', image: null, link: null },
+  { issuer: 'Placeholder Issuer', name: 'Certification Name Here', date: 'Month Year', image: null, link: null },
+  { issuer: 'Placeholder Issuer', name: 'Certification Name Here', date: 'Month Year', image: null, link: null },
+];
+
+function renderCerts() {
+  const grid = document.getElementById('cert-grid');
+  if (!grid) return;
+  grid.innerHTML = certsData.map((c, i) => {
+    const thumbHtml = c.image
+      ? `<div class="cert-card-thumb"><img src="${c.image}" alt="${c.name}" loading="lazy"/></div>`
+      : `<div class="cert-card-thumb"><div class="cert-card-thumb-placeholder"><div class="ctp-icon">🎓</div><div class="ctp-label">No image</div></div></div>`;
+    return `<button class="cert-card" onclick="openCertDetail(${i})">
+      ${thumbHtml}
+      <div class="cert-card-body">
+        <div class="cert-card-issuer">${c.issuer}</div>
+        <div class="cert-card-name">${c.name}</div>
+        <div class="cert-card-cta">View Certificate →</div>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+function openCertDetail(i) {
+  const c = certsData[i];
+  const imgCol  = document.getElementById('cert-detail-img-col');
+  const infoCol = document.getElementById('cert-detail-info');
+
+  imgCol.innerHTML = c.image
+    ? `<img src="${c.image}" alt="${c.name}" onclick="openLightbox('${c.image}')"/>
+       <span class="cert-zoom-hint">Click to enlarge</span>`
+    : `<div class="cert-detail-no-img">
+         <div class="ndimg-icon">🎓</div>
+         <div class="ndimg-label">No image uploaded</div>
+       </div>`;
+
+  const linkHtml = c.link
+    ? `<a href="${c.link}" target="_blank" rel="noopener" class="cert-link-btn">Visit Issuer Page ↗</a>`
+    : `<span class="cert-no-link">No links available</span>`;
+
+  infoCol.innerHTML = `
+    <div class="cd-label">${c.issuer}</div>
+    <div class="cd-name">${c.name}</div>
+    <div class="cd-date">${c.date}</div>
+    ${linkHtml}`;
+
+  document.getElementById('cert-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCertOverlay(e) {
+  if (e && document.getElementById('cert-detail-box').contains(e.target)) return;
+  document.getElementById('cert-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCertOverlay(); });
+
+// ── INIT ──────────────────────────────────────────────────────
+renderCards('python');
+renderCards('sql');
+renderCards('r');
+renderPBICards();
+renderCerts();
+renderRepos();
+</script>
+</body>
+</html>

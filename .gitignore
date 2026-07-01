@@ -1,0 +1,26 @@
+# ── OS junk files ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor / IDE folders ────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ── Temp / backup files ─────────────────────────────────────────
+*.tmp
+*.bak
+*~
+
+# ── Local-only assets you don't want pushed ─────────────────────
+# Uncomment if you keep large/raw source files locally that you
+# don't want cluttering the repo (keep only the optimized final
+# image inside Images/).
+# raw-assets/
+# *.psd
+# *.ai
+
+# ── Node/build artifacts (only relevant if you ever add tooling) ─
+node_modules/
+dist/
