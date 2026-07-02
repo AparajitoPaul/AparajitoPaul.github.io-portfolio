@@ -581,14 +581,8 @@ window.MathJax = {
     <div id="panel-python" class="proj-panel active"><div id="cards-python" class="proj-card-grid"></div><div id="detail-python" class="proj-detail-page"></div></div>
     <div id="panel-sql" class="proj-panel"><div id="cards-sql" class="proj-card-grid"></div><div id="detail-sql" class="proj-detail-page"></div></div>
     <div id="panel-powerbi" class="proj-panel"><div id="cards-powerbi" class="proj-card-grid"></div><div id="detail-powerbi" class="proj-detail-page"></div></div>
-    <div id="panel-excel" class="proj-panel">
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:2rem;">Excel projects hosted on Google Drive.</p>
-      <a href="YOUR_GOOGLE_DRIVE_LINK" target="_blank" class="external-btn">Open Excel Projects on Google Drive ↗</a>
-    </div>
-    <div id="panel-tableau" class="proj-panel">
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:2rem;">Interactive Tableau visualizations on Tableau Public.</p>
-      <a href="YOUR_TABLEAU_PUBLIC_LINK" target="_blank" class="external-btn">View on Tableau Public ↗</a>
-    </div>
+    <div id="panel-excel" class="proj-panel"><div id="cards-excel" class="proj-card-grid"></div><div id="detail-excel" class="proj-detail-page"></div></div>
+    <div id="panel-tableau" class="proj-panel"><div id="cards-tableau" class="proj-card-grid"></div><div id="detail-tableau" class="proj-detail-page"></div></div>
     <div id="panel-r" class="proj-panel"><div id="cards-r" class="proj-card-grid"></div><div id="detail-r" class="proj-detail-page"></div></div>
   </div>
 </div>
@@ -4251,6 +4245,14 @@ const projectData = {
     { name:'Statistical Modelling in R', overview:'Multiple and logistic regression with full diagnostics — residual plots, VIF checks, and stepwise model selection.', desc:'Built regression models on a housing dataset. Includes residual plots, Q-Q plots, Cook\'s distance, and model selection using AIC/BIC stepwise procedures.', findings:'4 significant predictors identified via stepwise selection. VIF analysis resolved multicollinearity. Final model achieved R² of 0.82 on the holdout set.', github:'#', image:null, emoji:'📐' },
     { name:'Data Visualisation with ggplot2', overview:'Publication-quality charts exploring income inequality, health outcomes, and education using custom ggplot2 themes.', desc:'A portfolio of ggplot2 charts exploring income inequality, health outcomes, and education attainment across US states. A custom dark theme was created for visual consistency.', findings:'Clear income inequality trends across age and education groups. Faceted plots revealed geographic clustering in health outcomes. Custom theme adopted across all portfolio R projects.', github:'#', image:null, emoji:'🎨' },
     { name:'Time Series Forecasting', overview:'ARIMA vs Prophet models on 3 years of monthly sales data — seasonal decomposition and forecast interval visualisation.', desc:'Applied ARIMA and Facebook Prophet to 3 years of monthly sales data. Includes STL decomposition, ACF/PACF analysis, and forecast interval visualisation.', findings:'Prophet outperformed ARIMA on MAPE by 8%. Strong yearly seasonality detected — December spike, February dip. Forecasts informed Q1 inventory planning decisions.', github:'#', image:null, emoji:'📈' },
+  ],
+  excel: [
+    { name:'Coffee Shop Sales Analytics Dashboard ', overview:'Built an interactive Excel dashboard to analyze 149K+ coffee shop transactions, delivering dynamic sales insights through KPI tracking, store-level drill-downs, trend analysis, and automated reporting for data-driven decision-making.', desc:'Interactive Excel dashboard analyzing 149K+ coffee shop transactions to uncover sales trends, store performance, and key business insights. To see the full dashboard kindly download the workbook and open in excel.', findings:'Sales showed a steady upward trend, peaking in June, with breakfast emerging as the highest revenue-generating meal period. Lower Manhattan was the top-performing store, while coffee remained the best-selling product category, highlighting key customer purchasing patterns.', link:'https://docs.google.com/spreadsheets/d/1l903HQC4ec6MA4ChqFWCjiSzuscDKxcL/edit?usp=sharing&ouid=105173929786021564364&rtpof=true&sd=true', image:'images/projects/coffee_shop_excel.png' },
+    { name:'Placeholder Excel Project 2', overview:'[Placeholder: add a one-line summary of this Excel project.]', desc:'[Placeholder: describe what this Excel project does.]', findings:'[Placeholder: summarize the key insights or results.]', link:'YOUR_GOOGLE_DRIVE_LINK_2', image:null, emoji:'📗' },
+  ],
+  tableau: [
+    { name:'Placeholder Tableau Dashboard 1', overview:'[Placeholder: add a one-line summary of this Tableau dashboard.]', desc:'[Placeholder: describe the dashboard — data source, visuals, interactivity.]', findings:'[Placeholder: summarize the key insights.]', link:'YOUR_TABLEAU_PUBLIC_LINK_1', image:null, emoji:'📊' },
+    { name:'Placeholder Tableau Dashboard 2', overview:'[Placeholder: add a one-line summary of this Tableau dashboard.]', desc:'[Placeholder: describe the dashboard.]', findings:'[Placeholder: summarize the key insights.]', link:'YOUR_TABLEAU_PUBLIC_LINK_2', image:null, emoji:'📊' },
   ]
 };
 
@@ -4302,6 +4304,15 @@ function showDetail(lang, idx) {
     ? `<img src="${p.image}" alt="${p.name}"/>`
     : `<div class="detail-hero-placeholder"><div class="big-icon">${p.emoji}</div><p>Add your project screenshot here</p></div>`;
 
+  let linkHTML = '';
+  if (lang === 'excel' && p.link) {
+    linkHTML = `<a href="${p.link}" target="_blank" class="github-btn">Open in Google Drive ↗</a>`;
+  } else if (lang === 'tableau' && p.link) {
+    linkHTML = `<a href="${p.link}" target="_blank" class="github-btn">View Tableau Dashboard ↗</a>`;
+  } else if (p.github) {
+    linkHTML = `<a href="${p.github}" target="_blank" class="github-btn">${githubSVG} View on GitHub</a>`;
+  }
+
   detailEl.innerHTML = `
     <button class="back-btn" onclick="backToCards('${lang}')">← Back to ${lang.toUpperCase()} projects</button>
     <div class="detail-hero-img-wrap">${heroContent}</div>
@@ -4311,7 +4322,7 @@ function showDetail(lang, idx) {
       <div><div class="detail-block"><div class="detail-block-label">Overview</div><div class="detail-block-text">${p.desc}</div></div></div>
       <div>
         <div class="detail-block"><div class="detail-block-label">Key Findings</div><div class="detail-block-text">${p.findings}</div></div>
-        <div style="margin-top:1.5rem;"><a href="${p.github}" target="_blank" class="github-btn">${githubSVG} View on GitHub</a></div>
+        <div style="margin-top:1.5rem;">${linkHTML}</div>
       </div>
     </div>`;
 
@@ -4526,7 +4537,7 @@ function switchTab(e, tab) {
   document.querySelectorAll('.proj-panel').forEach(p => p.classList.remove('active'));
   e.target.classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
-  ['python','sql','r','powerbi'].forEach(lang => {
+  ['python','sql','r','powerbi','excel','tableau'].forEach(lang => {
     const d = document.getElementById('detail-' + lang);
     const c = document.getElementById('cards-' + lang);
     if (d) { d.classList.remove('active'); d.innerHTML = ''; }
@@ -4634,6 +4645,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCertOve
 renderCards('python');
 renderCards('sql');
 renderCards('r');
+renderCards('excel');
+renderCards('tableau');
 renderPBICards();
 renderCerts();
 renderRepos();
