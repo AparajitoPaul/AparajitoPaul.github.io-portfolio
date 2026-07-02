@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Data Portfolio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0a'/%3E%3Ctext x='32' y='42' font-family='Arial, sans-serif' font-weight='800' font-size='26' fill='%23e8ff47' text-anchor='middle'%3EAP%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
   :root {
@@ -4247,7 +4248,7 @@ const projectData = {
     { name:'Time Series Forecasting', overview:'ARIMA vs Prophet models on 3 years of monthly sales data — seasonal decomposition and forecast interval visualisation.', desc:'Applied ARIMA and Facebook Prophet to 3 years of monthly sales data. Includes STL decomposition, ACF/PACF analysis, and forecast interval visualisation.', findings:'Prophet outperformed ARIMA on MAPE by 8%. Strong yearly seasonality detected — December spike, February dip. Forecasts informed Q1 inventory planning decisions.', github:'#', image:null, emoji:'📈' },
   ],
   excel: [
-    { name:'Coffee Shop Sales Analytics Dashboard ', overview:'Built an interactive Excel dashboard to analyze 149K+ coffee shop transactions, delivering dynamic sales insights through KPI tracking, store-level drill-downs, trend analysis, and automated reporting for data-driven decision-making.', desc:'Interactive Excel dashboard analyzing 149K+ coffee shop transactions to uncover sales trends, store performance, and key business insights. To see the full dashboard kindly download the workbook and open in excel.', findings:'Sales showed a steady upward trend, peaking in June, with breakfast emerging as the highest revenue-generating meal period. Lower Manhattan was the top-performing store, while coffee remained the best-selling product category, highlighting key customer purchasing patterns.', link:'https://docs.google.com/spreadsheets/d/1l903HQC4ec6MA4ChqFWCjiSzuscDKxcL/edit?usp=sharing&ouid=105173929786021564364&rtpof=true&sd=true', image:'images/projects/coffee_shop_excel.png' },
+    { name:'Placeholder Excel Project 1', overview:'[Placeholder: add a one-line summary of this Excel project.]', desc:'[Placeholder: describe what this Excel project does — e.g. pivot tables, VLOOKUP/XLOOKUP, macros, dashboards, financial modelling.]', findings:'[Placeholder: summarize the key insights or results from this analysis.]', link:'YOUR_GOOGLE_DRIVE_LINK_1', image:null, emoji:'📗' },
     { name:'Placeholder Excel Project 2', overview:'[Placeholder: add a one-line summary of this Excel project.]', desc:'[Placeholder: describe what this Excel project does.]', findings:'[Placeholder: summarize the key insights or results.]', link:'YOUR_GOOGLE_DRIVE_LINK_2', image:null, emoji:'📗' },
   ],
   tableau: [
@@ -4537,7 +4538,7 @@ function switchTab(e, tab) {
   document.querySelectorAll('.proj-panel').forEach(p => p.classList.remove('active'));
   e.target.classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
-  ['python','sql','r','powerbi','excel','tableau'].forEach(lang => {
+  ['python','sql','r','powerbi'].forEach(lang => {
     const d = document.getElementById('detail-' + lang);
     const c = document.getElementById('cards-' + lang);
     if (d) { d.classList.remove('active'); d.innerHTML = ''; }
