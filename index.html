@@ -4538,7 +4538,7 @@ function switchTab(e, tab) {
   document.querySelectorAll('.proj-panel').forEach(p => p.classList.remove('active'));
   e.target.classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
-  ['python','sql','r','powerbi'].forEach(lang => {
+  ['python','sql','r','powerbi','tableau','excel'].forEach(lang => {
     const d = document.getElementById('detail-' + lang);
     const c = document.getElementById('cards-' + lang);
     if (d) { d.classList.remove('active'); d.innerHTML = ''; }
