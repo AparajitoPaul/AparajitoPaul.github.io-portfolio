@@ -368,6 +368,11 @@
 
   /* Power BI screenshot gallery */
   .img-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+
+  /* Power BI live embed */
+  .pbi-embed-wrap { position: relative; width: 100%; max-width: 900px; margin: 0 0 2.5rem; border: 1px solid var(--border); background: var(--card); }
+  .pbi-embed-wrap::before { content: ''; display: block; padding-top: 62.25%; /* 373.5 / 600 aspect ratio */ }
+  .pbi-embed-wrap iframe { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; border: 0; }
   .gallery-thumb { border: 1px solid var(--border); overflow: hidden; cursor: zoom-in; transition: border-color 0.2s; }
   .gallery-thumb:hover { border-color: var(--accent); }
   .gallery-thumb img { width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.3s; }
@@ -4238,7 +4243,7 @@ const projectData = {
     { name:'E-Commerce Funnel Analysis', overview:'Full purchase funnel analysis from page view to checkout — identifying conversion rates and drop-off points.', desc:'Used event-level clickstream data to reconstruct the 6-step purchase funnel. Applied session attribution and cohort analysis to segment users by traffic source and device type.', findings:'Cart abandonment at 68%. Mobile users drop off 2× more at checkout. UX bottleneck traced to the address form — fixing it projects a 9% conversion lift.', github:'#', image:null, emoji:'🛒' },
   ],
   powerbi: [
-    { name:'Sales Performance Dashboard', overview:'Interactive executive dashboard tracking monthly revenue, regional breakdown, and top product performance with drill-through.', desc:'Built an executive-facing Power BI dashboard consolidating sales data from 3 regions. Features dynamic filtering by date range, product category, and territory — with KPI cards, trend lines, and drill-through pages.', findings:'Dashboard revealed the Western region underperforming targets by 18% YTD. Top 3 products account for 55% of revenue. Month-over-month trend lines exposed a post-Q1 dip worth investigating.', screenshots:[null,null,null], captions:['Overview — KPI Cards & Revenue Trend','Regional Breakdown — Map & Bar Chart','Product Drill-Through — SKU Performance'], emoji:'📊' },
+    { name:'Data Job Dashboard', overview:'An interactive dashboard showcasing global data job trends, including job demand, salary insights, and geographic distribution of opportunities.', desc:'Built an interactive Power BI dashboard to analyze the global data job market, providing insights into job demand, salary trends, top roles, and geographic distribution to support data-driven career and hiring decisions.', findings:'The analysis reveals that Data Engineer is the most sought-after role, followed by Data Analyst and Data Scientist. The average annual salary stands at $121K, with an average hourly wage of $49.16, reflecting strong earning potential in the field. With nearly 479K job postings, the dashboard highlights robust demand for data professionals, particularly across North America and Europe, while also indicating growing opportunities in other regions.', embed: '<iframe title="Job_dashboard" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNTUwYzUxMDEtOWY3NS00NGIwLTgxNDYtMDBlNWI4MjNlZDBmIiwidCI6Ijg5OWM1ZDljLTVmMjUtNDFmZS05YWVjLTdjYWI1MGY4YTQ4ZiJ9" frameborder="0" allowFullScreen="true"></iframe>',image:'images/projects/powerbi_job_dashboard.png' },
     { name:'HR Analytics Dashboard', overview:'Workforce health dashboard covering headcount, attrition waterfall charts, and department performance scores.', desc:'Designed for the HR team to monitor workforce health weekly. Combines headcount tables, attrition rate waterfall charts, and satisfaction gauges. Refreshes automatically via SharePoint connector.', findings:'Attrition spiked 23% in Q3 in Engineering. Highest turnover in the 1–2 year tenure band. Performance scores inversely correlated with team size above 12 members.', screenshots:[null,null], captions:['Attrition Waterfall & Headcount Trend','Department Performance Score Heatmap'], emoji:'👥' },
     { name:'Financial KPI Report', overview:'Monthly P&L interactive report replacing a legacy Excel file — budget vs actual variance analysis with live SQL Server data.', desc:'Replaced a legacy Excel report with an interactive Power BI report pulling live data from SQL Server. Features conditional formatting, budget-vs-actual variance bars, and YTD rolling calculations.', findings:'Cost overruns identified in 3 departments masked in the old Excel report. Revenue variance consistently positive in H2 but negative in Q1 — seasonal pattern now visible and trackable.', screenshots:[null,null], captions:['P&L Summary — Budget vs Actual','YTD Rolling Revenue & Cost Variance'], emoji:'💰' },
   ],
@@ -4285,7 +4290,7 @@ function renderPBICards() {
   if (!container) return;
   container.innerHTML = projectData.powerbi.map((p, i) => `
     <div class="proj-card" onclick="showPBIDetail(${i})">
-      ${cardImgHTML(p.screenshots[0], p.emoji)}
+      ${cardImgHTML(p.image || (p.screenshots && p.screenshots[0]), p.emoji)}
       <div class="proj-card-body">
         <div class="proj-card-lang">POWER BI</div>
         <div class="proj-card-title">${p.name}</div>
@@ -4337,19 +4342,31 @@ function showPBIDetail(idx) {
   const cardsEl = document.getElementById('cards-powerbi');
   const detailEl = document.getElementById('detail-powerbi');
 
-  const galleryHTML = p.screenshots.map((src, i) => {
-    const thumb = src
-      ? `<img src="${src}" alt="${p.captions[i]}" onclick="openLightbox('${src}')"/>`
-      : `<div class="gallery-thumb-placeholder"><div class="g-icon">🖼️</div><div class="g-label">Screenshot ${i + 1}</div></div>`;
-    return `<div class="gallery-thumb">${thumb}<div class="gallery-caption">${p.captions[i]}</div></div>`;
-  }).join('');
+  // If a live Power BI embed is provided, show that. Otherwise fall back
+  // to a screenshot gallery (if screenshots were provided).
+  let mediaHTML = '';
+  let mediaCaption = '';
+
+  if (p.embed) {
+    mediaHTML = `<div class="pbi-embed-wrap">${p.embed}</div>`;
+  } else if (p.screenshots && p.screenshots.length) {
+    mediaCaption = `<p style="font-size:0.7rem;color:var(--muted);margin-bottom:1.5rem;">Click any screenshot to enlarge ↗</p>`;
+    const galleryHTML = p.screenshots.map((src, i) => {
+      const caption = (p.captions && p.captions[i]) || '';
+      const thumb = src
+        ? `<img src="${src}" alt="${caption}" onclick="openLightbox('${src}')"/>`
+        : `<div class="gallery-thumb-placeholder"><div class="g-icon">🖼️</div><div class="g-label">Screenshot ${i + 1}</div></div>`;
+      return `<div class="gallery-thumb">${thumb}<div class="gallery-caption">${caption}</div></div>`;
+    }).join('');
+    mediaHTML = `<div class="img-gallery">${galleryHTML}</div>`;
+  }
 
   detailEl.innerHTML = `
     <button class="back-btn" onclick="backToCards('powerbi')">← Back to Power BI dashboards</button>
     <span style="font-size:0.63rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">POWER BI dashboard</span>
     <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-0.02em;margin:0.75rem 0 0.5rem;">${p.name}</h2>
-    <p style="font-size:0.7rem;color:var(--muted);margin-bottom:1.5rem;">Click any screenshot to enlarge ↗</p>
-    <div class="img-gallery">${galleryHTML}</div>
+    ${mediaCaption}
+    ${mediaHTML}
     <div class="proj-detail-grid">
       <div><div class="detail-block"><div class="detail-block-label">About This Dashboard</div><div class="detail-block-text">${p.desc}</div></div></div>
       <div><div class="detail-block"><div class="detail-block-label">Key Findings</div><div class="detail-block-text">${p.findings}</div></div></div>
